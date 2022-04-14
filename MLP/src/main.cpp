@@ -25,12 +25,6 @@ struct InsertionInfo{
   double custo;
 };
 
-struct SubsequenceInfo{
-  double tempoTotal;
-  double custoAcumulado;
-};
-
-
 struct Subsequence{
   double T, C;
   int W;
@@ -40,7 +34,7 @@ struct Subsequence{
     
     Subsequence sigma;
 
-    double temp= t[sigma1.last][sigma2.first];
+    double temp= matrizAdj[sigma1.last][sigma2.first];
 
     sigma.W= sigma1.W + sigma2.W;
     sigma.T= sigma1.T + sigma2.T;
@@ -61,6 +55,8 @@ void updateSubseq(Solution &s, vector<vector<Subsequence>> &subseqMatrix){  //fa
 
     int n= s.sequence.size();
 
+    cout << "update";
+
     for(int i= 0; i < n; i++){
 
       int v = s.sequence[i];
@@ -72,7 +68,7 @@ void updateSubseq(Solution &s, vector<vector<Subsequence>> &subseqMatrix){  //fa
       subseqMatrix[i][i].last = s.sequence[i];
     }
 
-    for (int i = 0; i < n; i++){
+    for (int i = 0; i < n; i++){          
 
       for (int j = i + 1; j < n; j++){
         subseqMatrix[i][j] = Subsequence::Concatenate(subseqMatrix[i][j-1], subseqMatrix[j][j]);
@@ -84,8 +80,11 @@ void updateSubseq(Solution &s, vector<vector<Subsequence>> &subseqMatrix){  //fa
 
     for(int j= i-1; j >= 0; j--){
       subseqMatrix[i][j] = Subsequence::Concatenate(subseqMatrix[i][j+1], subseqMatrix[j][j]);
+   
     }
+  
   }
+
 }
 
 vector<InsertionInfo> calcularCustoInsercao (Solution& s, std::vector<int>& CL){  //calcular o custo da insercao de cada vertice para Construcao
@@ -164,7 +163,7 @@ Solution Construction (Solution &s, vector<int> CL){  //metodo da construcao
   return s;
 }
 
-
+/////
 
 int main(int argc, char** argv) {
 
@@ -174,11 +173,14 @@ int main(int argc, char** argv) {
     int maxIter, maxIterIls;
     int i, count, j;
     vector<int> CL;    
-    vector<vector<Subsequence>> subseqMatrix;
+
+    cout << "ola";
 
     readData(argc, argv, &vertices, &matrizAdj);
 
-   
+    vector<vector<Subsequence>> subseqMatrix(vertices, vector<Subsequence>(vertices));
+
+    cout << "ola";
 
     if(vertices <= 150){
       maxIterIls= vertices/ 2.0;
@@ -191,11 +193,12 @@ int main(int argc, char** argv) {
       CL.push_back(i);
     }
 
-   bestOfAll.costSolution= (double) INFINITY;
-   maxIter= 50;
+
+   maxIter= 1;
    for(i= 0; i < maxIter; i++){
       
       s= Construction(s, CL);
+
 
       updateSubseq(s, subseqMatrix);
 
@@ -223,10 +226,6 @@ int main(int argc, char** argv) {
       // //   // cout << s.custoSolucao << endl;
       // //   count++;
       // // }
-
-    if(bestS.costSolution < bestOfAll.costSolution){
-      bestOfAll= bestS;
-    }
-     
     
    }
+}
