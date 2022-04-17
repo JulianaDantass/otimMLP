@@ -26,65 +26,12 @@ struct InsertionInfo{
 };
 
 struct Subsequence{
-  double T, C;
-  int W;
-  int first, last;
-
-  inline static Subsequence Concatenate(Subsequence &sigma1, Subsequence &sigma2){
-    
-    Subsequence sigma;
-
-    double temp= matrizAdj[sigma1.last][sigma2.first];
-
-    sigma.W= sigma1.W + sigma2.W;
-    sigma.T= sigma1.T + sigma2.T;
-    sigma.C= sigma1.C + sigma2.W * (sigma1.T + temp) + sigma2.C;
-    sigma.first= sigma1.first;
-    sigma.last= sigma2.last;
-
-    return sigma;
-  }
-
+  double tempoTotal;
+  double custoAcumulado;
 };
 
 bool compares(InsertionInfo a, InsertionInfo b){  //funcao auxiliar na ordenacao dos custos
   return a.custo < b.custo;
-}
-
-void updateSubseq(Solution &s, vector<vector<Subsequence>> &subseqMatrix){  //fazer o calculo do custo das subsequencias
-
-    int n= s.sequence.size();
-
-    cout << "update";
-
-    for(int i= 0; i < n; i++){
-
-      int v = s.sequence[i];
-
-      subseqMatrix[i][i].W = (i > 0);
-      subseqMatrix[i][i].C = 0;
-      subseqMatrix[i][i].T = 0;
-      subseqMatrix[i][i].first = s.sequence[i];
-      subseqMatrix[i][i].last = s.sequence[i];
-    }
-
-    for (int i = 0; i < n; i++){          
-
-      for (int j = i + 1; j < n; j++){
-        subseqMatrix[i][j] = Subsequence::Concatenate(subseqMatrix[i][j-1], subseqMatrix[j][j]);
-      }
-    
-    }
-    
-  for(int i= n-1; i >= 0; i--){
-
-    for(int j= i-1; j >= 0; j--){
-      subseqMatrix[i][j] = Subsequence::Concatenate(subseqMatrix[i][j+1], subseqMatrix[j][j]);
-   
-    }
-  
-  }
-
 }
 
 vector<InsertionInfo> calcularCustoInsercao (Solution& s, std::vector<int>& CL){  //calcular o custo da insercao de cada vertice para Construcao
@@ -114,7 +61,7 @@ vector<InsertionInfo> calcularCustoInsercao (Solution& s, std::vector<int>& CL){
   return custoInsercao;
 }
 
-Solution Construction (Solution &s, vector<int> CL){  //metodo da construcao
+Solution Construction (Solution &s, vector<int> CL){  //gerando uma solucao inicial
 
   int indexRandom, i, j;  
   
@@ -136,18 +83,17 @@ Solution Construction (Solution &s, vector<int> CL){  //metodo da construcao
     s.sequence.insert(s.sequence.end()-1, CL[indexRandom]);
     CL.erase(CL.begin() + indexRandom);
 
-    //
 
   while(!CL.empty()){
 
-    std::vector<InsertionInfo> custoInsercao= calcularCustoInsercao(s, CL);
+    std::vector<InsertionInfo> custoInsercao= calcularCustoInsercao(s, CL);  //calculando os custos de cada insercao
 
-    sort(custoInsercao.begin(), custoInsercao.end(), compares);   
+    sort(custoInsercao.begin(), custoInsercao.end(), compares);    //ordenando os custos
     
     double alpha= (double) rand() / RAND_MAX;
-    int selecionado= rand() % ( (int) ceil(alpha * custoInsercao.size()) );
+    int selecionado= rand() % ( (int) ceil(alpha * custoInsercao.size()) );       //selecionando um dos candidatos de melhor custo
 
-    s.sequence.insert(s.sequence.begin()+ custoInsercao[selecionado].arestaRemovida + 1, custoInsercao[selecionado].noInserido);
+    s.sequence.insert(s.sequence.begin()+ custoInsercao[selecionado].arestaRemovida + 1, custoInsercao[selecionado].noInserido);  //inserindo o candidato
 
     j= 0;
     while(1){                     //retirando a cidade inserida da lista de candidatos  
@@ -163,7 +109,30 @@ Solution Construction (Solution &s, vector<int> CL){  //metodo da construcao
   return s;
 }
 
-/////
+
+void updateSubseq(Solution &s, vector<vector<Subsequence>> &subseqMatrix){  //fazer o calculo do custo das subsequencias
+
+  int i, j;
+
+  int n= s.sequence.size();
+                                            
+      
+  for(i= 0; i < n; i++){                                                
+
+    subseqMatrix[i][i].tempoTotal= 0;
+
+      for(j= i+1; j < n; j++){    
+
+        subseqMatrix[i][j].tempoTotal= subseqMatrix[i][j-1].tempoTotal + matrizAdj[s.sequence[j-1]][s.sequence[j]];
+
+      }
+     
+   }
+
+
+}
+
+
 
 int main(int argc, char** argv) {
 
@@ -174,13 +143,9 @@ int main(int argc, char** argv) {
     int i, count, j;
     vector<int> CL;    
 
-    cout << "ola";
-
     readData(argc, argv, &vertices, &matrizAdj);
 
-    vector<vector<Subsequence>> subseqMatrix(vertices, vector<Subsequence>(vertices));
-
-    cout << "ola";
+    vector<vector<Subsequence>> subseqMatrix;
 
     if(vertices <= 150){
       maxIterIls= vertices/ 2.0;
@@ -194,7 +159,7 @@ int main(int argc, char** argv) {
     }
 
 
-   maxIter= 1; ///hgoihgohgg
+   maxIter= 1;
    for(i= 0; i < maxIter; i++){
       
       s= Construction(s, CL);
