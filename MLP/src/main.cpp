@@ -194,7 +194,7 @@ int main(int argc, char** argv) {
     }
 
 
-   maxIter= 1;
+   maxIter= 1; ///hgoihgohgg
    for(i= 0; i < maxIter; i++){
       
       s= Construction(s, CL);
