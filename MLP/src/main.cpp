@@ -117,18 +117,17 @@ void updateSubseq(Solution &s, vector<vector<Subsequence>> &subseqMatrix){  //fa
   int n= s.sequence.size();
                                             
       
-  for(i= 0; i < n; i++){                                                
+  for(i= 0; i < n; i++){                                                //matriz[0][1] 
 
     subseqMatrix[i][i].tempoTotal= 0;
 
       for(j= i+1; j < n; j++){    
 
         subseqMatrix[i][j].tempoTotal= subseqMatrix[i][j-1].tempoTotal + matrizAdj[s.sequence[j-1]][s.sequence[j]];
-
+        subseqMatrix[i][j].custoAcumulado= subseqMatrix[i][j-1].custoAcumulado + subseqMatrix[i][j-1].tempoTotal;
       }
      
    }
-
 
 }
 
