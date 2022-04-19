@@ -115,9 +115,8 @@ void updateSubseq(Solution &s, vector<vector<Subsequence>> &subseqMatrix){  //fa
   int i, j;
 
   int n= s.sequence.size();
-  
-  
-  for(i= 0; i < n; i++){                                               
+
+  for(i= 0; i < n-1; i++){                   
     
     subseqMatrix[i][i].tempoTotal= 0;
     subseqMatrix[i][i].custoAcumulado= 0;
@@ -130,7 +129,49 @@ void updateSubseq(Solution &s, vector<vector<Subsequence>> &subseqMatrix){  //fa
      
    }
 
+  cout << subseqMatrix[0][3].custoAcumulado << endl;
+  cout << matrizAdj[s.sequence[0]][s.sequence[1]] + matrizAdj[s.sequence[0]][s.sequence[1]] + matrizAdj[s.sequence[1]][s.sequence[2]] + 
+          + matrizAdj[s.sequence[0]][s.sequence[1]] + matrizAdj[s.sequence[1]][s.sequence[2]] + matrizAdj[s.sequence[2]][s.sequence[3]];
+
 }
+
+// void BuscaLocal (Solution& s){
+
+//   vector<int>NL= {1, 2, 3, 4, 5};
+//   bool improved= false;
+  
+//   while(!NL.empty()){
+    
+//     int n= rand() % NL.size();
+
+//     switch (NL[n]) {
+//       case 1: 
+//         improved= BestImprovementSwap(s);    
+//         break;
+//       case 2: 
+//         improved= BestImprovement2Opt(s);  
+//         break;
+//       case 3:
+//         improved= BestImprovementOrOpt(s, 1);   //reinsertion    
+//         break;
+//       case 4:
+//         improved= BestImprovementOrOpt(s, 2);   //Or-opt2      
+//         break;
+//       case 5:
+//         improved= BestImprovementOrOpt(s, 3);   //Or-opt3      
+//         break;
+//     }
+    
+
+//     if(improved){
+//       NL={1, 2, 3, 4, 5};
+
+//     }else{
+//       NL.erase(NL.begin() + n);
+//     }
+    
+//   } 
+// }
 
 
 
@@ -143,9 +184,11 @@ int main(int argc, char** argv) {
     int i, count, j;
     vector<int> CL;    
 
-    readData(argc, argv, &vertices, &matrizAdj);
+    readData(argc, argv, &vertices, &matrizAdj);                                                      
 
-    vector<vector<Subsequence>> subseqMatrix;
+    
+    vector<vector<Subsequence>> subseqMatrix(vertices, vector<Subsequence>(vertices)); 
+
 
     if(vertices <= 150){
       maxIterIls= vertices/ 2.0;
@@ -166,30 +209,30 @@ int main(int argc, char** argv) {
 
       updateSubseq(s, subseqMatrix);
 
-      // bestS= s;
+      bestS= s;
 
-      // count= 0;
+      count= 0;
       
 
-      // // while(count < maxIterIls){
-      // //   BuscaLocal(s);
+      while(count < maxIterIls){
+        // BuscaLocal(s);
         
-      // //   if(s.costSolution < bestS.costSolution){
-      // //     bestS= s;
-      // //     count= 0;
-      // //   }
-      // //   // for(j= 0; j < s.sequence.size(); j++){
-      // //   //   cout << s.sequence[j] << " ";
-      // //   // }
-      // //   // cout << endl;
-      // //     s= Pertubacao(bestS);  
+        // if(s.costSolution < bestS.costSolution){
+        //   bestS= s;
+        //   count= 0;
+        // }
+        // for(j= 0; j < s.sequence.size(); j++){
+        //   cout << s.sequence[j] << " ";
+        // }
+        // cout << endl;
+          // s= Pertubacao(bestS);  
          
-      // //   // for(j= 0; j < s.sequence.size(); j++){
-      // //   //   cout << s.sequence[j] << " ";
-      // //   // }
-      // //   // cout << s.custoSolucao << endl;
-      // //   count++;
-      // // }
+        // for(j= 0; j < s.sequence.size(); j++){
+        //   cout << s.sequence[j] << " ";
+        // }
+        // cout << s.custoSolucao << endl;
+        count++;
+      }
     
    }
 }
