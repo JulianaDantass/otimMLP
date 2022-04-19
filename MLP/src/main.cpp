@@ -397,7 +397,7 @@ int main(int argc, char** argv) {
 
       updateSubseq(s, subseqMatrix);
 
-      cout << subseqMatrix[s.sequence[0]][s.sequence[vertices-1]].custoAcumulado;
+      bestCustoAcum= subseqMatrix[s.sequence[0]][s.sequence[vertices-1]].custoAcumulado;
       bestS= s;
 
       count= 0;
@@ -407,15 +407,16 @@ int main(int argc, char** argv) {
         BuscaLocal(s, subseqMatrix);
         
         sCustoAcum= subseqMatrix[s.sequence[0]][s.sequence[vertices-1]].custoAcumulado;
-        // if(s.costSolution < bestS.costSolution){
-        //   bestS= s;
-        //   count= 0;
-        // }
+
+        if(sCustoAcum < bestCustoAcum){
+          bestS= s;
+          count= 0;
+        }
         // for(j= 0; j < s.sequence.size(); j++){
         //   cout << s.sequence[j] << " ";
         // }
         // cout << endl;
-          // s= Pertubacao(bestS);  
+        //   s= Pertubacao(bestS);  
          
         // for(j= 0; j < s.sequence.size(); j++){
         //   cout << s.sequence[j] << " ";
