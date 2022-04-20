@@ -132,42 +132,42 @@ void updateSubseq(Solution &s, vector<vector<Subsequence>> &subseqMatrix){  //fa
 
 }
 
-bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseqMatrix){         //estrutura de vizinhança: SWAP 
+// bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseqMatrix){         //estrutura de vizinhança: SWAP 
 
-  double delta;
-  double bestDelta= 0;
-  int best_i, best_j;
-  int i, j;
-  double partialCost;
+//   double delta;
+//   double bestDelta= 0;
+//   int best_i, best_j;
+//   int i, j;
+//   double partialCost;
 
 
-  for(i= 1; i < vertices - 1; i++) {
+//   for(i= 1; i < vertices - 1; i++) {
 
-    for (j= i + 1; j < vertices; j++){
+//     for (j= i + 1; j < vertices; j++){
       
-      if(i == j-1){
-        delta= subseqMatrix[i][j].custoAcumulado;
-      }else{
-        delta= partialCost - matrizAdj[s.sequence[j]][s.sequence[j+1]] - matrizAdj[s.sequence[j-1]][s.sequence[j]] 
-                                + matrizAdj[s.sequence[i-1]][s.sequence[j]] + matrizAdj[s.sequence[i+1]][s.sequence[j]] + matrizAdj[s.sequence[i]][s.sequence[j+1]] + matrizAdj[s.sequence[i]][s.sequence[j-1]];
-      }
+//       if(i == j-1){
+//         delta= subseqMatrix[i][j].custoAcumulado;
+//       }else{
+//         delta= partialCost - matrizAdj[s.sequence[j]][s.sequence[j+1]] - matrizAdj[s.sequence[j-1]][s.sequence[j]] 
+//                                 + matrizAdj[s.sequence[i-1]][s.sequence[j]] + matrizAdj[s.sequence[i+1]][s.sequence[j]] + matrizAdj[s.sequence[i]][s.sequence[j+1]] + matrizAdj[s.sequence[i]][s.sequence[j-1]];
+//       }
 
-      if(delta < bestDelta){
-        bestDelta= delta;
-        best_i= i;
-        best_j= j;
-      }
-    }
-  }
+//       if(delta < bestDelta){
+//         bestDelta= delta;
+//         best_i= i;
+//         best_j= j;
+//       }
+//     }
+//   }
 
-  if (bestDelta < 0){
-    swap(s.sequence[best_i], s.sequence[best_j]);
-    // s.custoSolucao= s.custoSolucao + bestDelta;
-    return true;
-  }
+//   if (bestDelta < 0){
+//     swap(s.sequence[best_i], s.sequence[best_j]);
+//     // s.custoSolucao= s.custoSolucao + bestDelta;
+//     return true;
+//   }
 
-  return false;
-}
+//   return false;
+// }
 
 bool BestImprovement2Opt (Solution& s, vector<vector<Subsequence>> &subseqMatrix){         //estrutura de vizinhança: 2opt 
 
@@ -180,7 +180,7 @@ bool BestImprovement2Opt (Solution& s, vector<vector<Subsequence>> &subseqMatrix
 
 
   for(i= 1; i < vertices - 2; i++) {
-    
+
     for (j= i + 2; j < vertices-1; j++){
       
       partialCost= subseqMatrix[0][i-1].custoAcumulado + ( (j-i+1) * (subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]]) ) 
@@ -206,7 +206,6 @@ bool BestImprovement2Opt (Solution& s, vector<vector<Subsequence>> &subseqMatrix
       swap(s.sequence[i], s.sequence[j]);
       j--;
     }
-    // s.custoSolucao= s.custoSolucao + bestDelta;
     
     return true;
   }
@@ -216,10 +215,12 @@ bool BestImprovement2Opt (Solution& s, vector<vector<Subsequence>> &subseqMatrix
 
 bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseqMatrix, int quantity){   //as 3 outras estruturas de vizinhança 
 
-  double delta, bestDelta= 0;
+  double bestCost;
   int best_i, best_j;
   int i, j;
-  double partialCost;
+  double partialCost, secondCost, cost;
+
+  bestCost= subseqMatrix[0][vertices].custoAcumulado;
 
 
   switch(quantity){
@@ -257,72 +258,72 @@ bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseqMatri
       }
       return false;
 
-    case 2:          //método: OR-OPT-2
+  //   case 2:          //método: OR-OPT-2
 
-      for(i= 1; i < vertices- 2; i++) {
+  //     for(i= 1; i < vertices- 2; i++) {
 
-        partialCost= - matrizAdj[s.sequence[i-1]][s.sequence[i]] - matrizAdj[s.sequence[i+1]][s.sequence[i+2]] + matrizAdj[s.sequence[i-1]][s.sequence[i+2]];
+  //       partialCost= - matrizAdj[s.sequence[i-1]][s.sequence[i]] - matrizAdj[s.sequence[i+1]][s.sequence[i+2]] + matrizAdj[s.sequence[i-1]][s.sequence[i+2]];
 
-        for (j= i + 2; j < vertices- 1; j++){
+  //       for (j= i + 2; j < vertices- 1; j++){
           
-          delta=  partialCost - matrizAdj[s.sequence[j+1]][s.sequence[j+2]]
-                                   + matrizAdj[s.sequence[j+1]][s.sequence[i]] + matrizAdj[s.sequence[i+1]][s.sequence[j+2]];
+  //         delta=  partialCost - matrizAdj[s.sequence[j+1]][s.sequence[j+2]]
+  //                                  + matrizAdj[s.sequence[j+1]][s.sequence[i]] + matrizAdj[s.sequence[i+1]][s.sequence[j+2]];
 
 
-          if(delta < bestDelta){
-            bestDelta= delta;
-            best_i= i;
-            best_j= j;
-          }
-        }
-      }
+  //         if(delta < bestDelta){
+  //           bestDelta= delta;
+  //           best_i= i;
+  //           best_j= j;
+  //         }
+  //       }
+  //     }
 
-      if (bestDelta < 0){
-        s.sequence.insert(s.sequence.begin() + best_j + 2, s.sequence[best_i]);
-        s.sequence.insert(s.sequence.begin() + best_j + 3, s.sequence[best_i+1]);
-        s.sequence.erase(s.sequence.begin() + (best_i + 1));
-        s.sequence.erase(s.sequence.begin() + best_i);
-        // s.custoSolucao= s.custoSolucao + bestDelta;
+  //     if (bestDelta < 0){
+  //       s.sequence.insert(s.sequence.begin() + best_j + 2, s.sequence[best_i]);
+  //       s.sequence.insert(s.sequence.begin() + best_j + 3, s.sequence[best_i+1]);
+  //       s.sequence.erase(s.sequence.begin() + (best_i + 1));
+  //       s.sequence.erase(s.sequence.begin() + best_i);
+  //       // s.custoSolucao= s.custoSolucao + bestDelta;
         
-        return true;
-      }
-      return false;
+  //       return true;
+  //     }
+  //     return false;
 
-    case 3:      //método: OR-OPT-3
+  //   case 3:      //método: OR-OPT-3
 
-      for(i= 1; i < vertices - 3; i++) {
+  //     for(i= 1; i < vertices - 3; i++) {
 
-        partialCost= - matrizAdj[s.sequence[i-1]][s.sequence[i]] - matrizAdj[s.sequence[i+2]][s.sequence[i+3]] + matrizAdj[s.sequence[i-1]][s.sequence[i+3]];
+  //       partialCost= - matrizAdj[s.sequence[i-1]][s.sequence[i]] - matrizAdj[s.sequence[i+2]][s.sequence[i+3]] + matrizAdj[s.sequence[i-1]][s.sequence[i+3]];
 
-        for (j= i + 3; j < vertices - 2; j++){
+  //       for (j= i + 3; j < vertices - 2; j++){
 
-          delta=  partialCost - matrizAdj[s.sequence[j+2]][s.sequence[j+3]]
-                              + matrizAdj[s.sequence[j+2]][s.sequence[i]] + matrizAdj[s.sequence[i+2]][s.sequence[j+3]];
+  //         delta=  partialCost - matrizAdj[s.sequence[j+2]][s.sequence[j+3]]
+  //                             + matrizAdj[s.sequence[j+2]][s.sequence[i]] + matrizAdj[s.sequence[i+2]][s.sequence[j+3]];
       
 
-          if(delta < bestDelta){
-            bestDelta= delta;
-            best_i= i;
-            best_j= j;
-          }
-        }
+  //         if(delta < bestDelta){
+  //           bestDelta= delta;
+  //           best_i= i;
+  //           best_j= j;
+  //         }
+  //       }
         
-      }
+  //     }
 
-      if (bestDelta < 0){
-        s.sequence.insert(s.sequence.begin() + best_j + 3, s.sequence[best_i]);
-        s.sequence.insert(s.sequence.begin() + best_j + 4, s.sequence[best_i+1]);
-        s.sequence.insert(s.sequence.begin() + best_j + 5, s.sequence[best_i+2]);
-        s.sequence.erase(s.sequence.begin() + (best_i + 2));
-        s.sequence.erase(s.sequence.begin() + (best_i + 1));
-        s.sequence.erase(s.sequence.begin() + best_i);
-        // s.custoSolucao= s.custoSolucao + bestDelta;
+  //     if (bestDelta < 0){
+  //       s.sequence.insert(s.sequence.begin() + best_j + 3, s.sequence[best_i]);
+  //       s.sequence.insert(s.sequence.begin() + best_j + 4, s.sequence[best_i+1]);
+  //       s.sequence.insert(s.sequence.begin() + best_j + 5, s.sequence[best_i+2]);
+  //       s.sequence.erase(s.sequence.begin() + (best_i + 2));
+  //       s.sequence.erase(s.sequence.begin() + (best_i + 1));
+  //       s.sequence.erase(s.sequence.begin() + best_i);
+  //       // s.custoSolucao= s.custoSolucao + bestDelta;
         
-        return true;
-      }
+  //       return true;
+  //     }
       
-      return false;  
-  }
+  //     return false;  
+  // }
 }
 
 void BuscaLocal (Solution& s, vector<vector<Subsequence>> &subseqMatrix){
@@ -336,7 +337,7 @@ void BuscaLocal (Solution& s, vector<vector<Subsequence>> &subseqMatrix){
 
     switch (NL[n]) {
       case 1: 
-        improved= BestImprovementSwap(s, subseqMatrix);    
+        // improved= BestImprovementSwap(s, subseqMatrix);    
         break;
       case 2: 
         improved= BestImprovement2Opt(s, subseqMatrix);  
