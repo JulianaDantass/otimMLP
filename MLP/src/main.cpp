@@ -132,42 +132,45 @@ void updateSubseq(Solution &s, vector<vector<Subsequence>> &subseqMatrix){  //fa
 
 }
 
-// bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseqMatrix){         //estrutura de vizinhança: SWAP 
+bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseqMatrix){         //estrutura de vizinhança: SWAP 
 
-//   double delta;
-//   double bestDelta= 0;
-//   int best_i, best_j;
-//   int i, j;
-//   double partialCost;
+  double delta;
+  double bestDelta= 0;
+  int best_i, best_j;
+  int i, j;
+  double partialCost, secondCost, cost;
 
 
-//   for(i= 1; i < vertices - 1; i++) {
 
-//     for (j= i + 1; j < vertices; j++){
+  for(i= 1; i < vertices - 1; i++) {
+
+    for (j= i + 1; j < vertices; j++){
       
-//       if(i == j-1){
-//         delta= subseqMatrix[i][j].custoAcumulado;
-//       }else{
-//         delta= partialCost - matrizAdj[s.sequence[j]][s.sequence[j+1]] - matrizAdj[s.sequence[j-1]][s.sequence[j]] 
-//                                 + matrizAdj[s.sequence[i-1]][s.sequence[j]] + matrizAdj[s.sequence[i+1]][s.sequence[j]] + matrizAdj[s.sequence[i]][s.sequence[j+1]] + matrizAdj[s.sequence[i]][s.sequence[j-1]];
-//       }
+      partialCost = subseqMatrix[0][i-1].custoAcumulado + ( (j-i+1) * (subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]))
+                    + subseqMatrix[j][i].custoAcumulado;
 
-//       if(delta < bestDelta){
-//         bestDelta= delta;
-//         best_i= i;
-//         best_j= j;
-//       }
-//     }
-//   }
 
-//   if (bestDelta < 0){
-//     swap(s.sequence[best_i], s.sequence[best_j]);
-//     // s.custoSolucao= s.custoSolucao + bestDelta;
-//     return true;
-//   }
+      secondCost= subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]] + subseqMatrix[j][i].tempoTotal;
 
-//   return false;
-// }
+
+      cost = partialCost + ((vertices-j) * (partialCost + matrizAdj[s.sequence[i]][s.sequence[j+1]]) + subseqMatrix[j+1][vertices].custoAcumulado);
+
+      if(delta < bestDelta){
+        bestDelta= delta;
+        best_i= i;
+        best_j= j;
+      }
+    }
+  }
+
+  if (bestDelta < 0){
+    swap(s.sequence[best_i], s.sequence[best_j]);
+    // s.custoSolucao= s.custoSolucao + bestDelta;
+    return true;
+  }
+
+  return false;
+}
 
 bool BestImprovement2Opt (Solution& s, vector<vector<Subsequence>> &subseqMatrix){         //estrutura de vizinhança: 2opt    //alterada
 
@@ -237,7 +240,7 @@ bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseqMatri
                                          
      	      secondCost= subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]] + matrizAdj[i][j+1] + matrizAdj[j][i];
 
-            cost = partialCost + ( (vertices-j) * (secondCost) + subseqMatrix[j+1][vertices].custoAcumulado;
+            cost = partialCost + ( (vertices-j) * secondCost ) + subseqMatrix[j+1][vertices].custoAcumulado;
 
           }
           
