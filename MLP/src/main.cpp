@@ -132,6 +132,7 @@ void updateSubseq(Solution &s, vector<vector<Subsequence>> &subseqMatrix){  //fa
 
 }
 
+
 bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseqMatrix){         //estrutura de vizinhança: SWAP 
 
   double delta;
@@ -140,14 +141,13 @@ bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseqMatrix
   int i, j;
   double partialCost, secondCost, cost;
 
-
+  double bestCost= subseqMatrix[0][vertices].custoAcumulado;
 
   for(i= 1; i < vertices - 1; i++) {
 
     for (j= i + 1; j < vertices; j++){
       
-      partialCost = subseqMatrix[0][i-1].custoAcumulado + ( (j-i+1) * (subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]))
-                    + subseqMatrix[j][i].custoAcumulado;
+      partialCost = subseqMatrix[0][i-1].custoAcumulado + ( (j-i+1) * (subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]] )) + subseqMatrix[j][i].custoAcumulado;
 
 
       secondCost= subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]] + subseqMatrix[j][i].tempoTotal;
@@ -171,6 +171,7 @@ bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseqMatrix
 
   return false;
 }
+
 
 bool BestImprovement2Opt (Solution& s, vector<vector<Subsequence>> &subseqMatrix){         //estrutura de vizinhança: 2opt    //alterada
 
@@ -215,6 +216,7 @@ bool BestImprovement2Opt (Solution& s, vector<vector<Subsequence>> &subseqMatrix
 
   return false; 
 }
+
 
 bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseqMatrix, int quantity){   //as 3 outras estruturas de vizinhança 
 
@@ -346,7 +348,7 @@ void BuscaLocal (Solution& s, vector<vector<Subsequence>> &subseqMatrix){
 
     switch (NL[n]) {
       case 1: 
-        // improved= BestImprovementSwap(s, subseqMatrix);    
+        improved= BestImprovementSwap(s, subseqMatrix);    
         break;
       case 2: 
         improved= BestImprovement2Opt(s, subseqMatrix);  
@@ -371,6 +373,7 @@ void BuscaLocal (Solution& s, vector<vector<Subsequence>> &subseqMatrix){
     }
     
   } 
+
  }
 
 
