@@ -145,7 +145,7 @@ bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseqMatrix
 
   for(i= 1; i < vertices - 1; i++) {
 
-    for (j= i + 1; j < vertices; j++){
+    for (j= i + 1; j < vertices-1; j++){
       
       partialCost = subseqMatrix[0][i-1].custoAcumulado + ( (j-i+1) * (subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]]) ) + subseqMatrix[j][i].custoAcumulado;
 
@@ -385,8 +385,6 @@ void BuscaLocal (Solution& s, vector<vector<Subsequence>> &subseqMatrix){
  }
 
 
-
-
 int main(int argc, char** argv) {
 
     clock_t start= clock();    //inicia a contagem do tempo de execucao  
@@ -427,10 +425,13 @@ int main(int argc, char** argv) {
 
       count= 0;
       
-
+      cout << "construcao" << endl; 
       while(count < maxIterIls){
+
+        cout << "antes busca" << endl; 
         BuscaLocal(s, subseqMatrix);
         
+        cout << "depois busca" << endl; 
         sCustoAcum= subseqMatrix[s.sequence[0]][s.sequence[vertices-1]].custoAcumulado;
 
         if(sCustoAcum < bestCustoAcum){
