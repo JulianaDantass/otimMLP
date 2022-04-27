@@ -147,7 +147,7 @@ bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseqMatrix
 
     for (j= i + 1; j < vertices; j++){
       
-      partialCost = subseqMatrix[0][i-1].custoAcumulado + ( (j-i+1) * (subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]] )) + subseqMatrix[j][i].custoAcumulado;
+      partialCost = subseqMatrix[0][i-1].custoAcumulado + ( (j-i+1) * (subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]]) ) + subseqMatrix[j][i].custoAcumulado;
 
 
       secondCost= subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]] + subseqMatrix[j][i].tempoTotal;
@@ -187,12 +187,11 @@ bool BestImprovement2Opt (Solution& s, vector<vector<Subsequence>> &subseqMatrix
 
     for (j= i + 2; j < vertices-1; j++){
       
-      partialCost= subseqMatrix[0][i-1].custoAcumulado + ( (j-i+1) * (subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]]) ) 
-                    +subseqMatrix[j][i].custoAcumulado;
+      partialCost= subseqMatrix[0][i-1].custoAcumulado + ( (j-i+1) * (subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]]) ) + subseqMatrix[j][i].custoAcumulado;
                             
       secondCost= subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]] + subseqMatrix[j][i].tempoTotal;
 
-      cost = partialCost + ( (vertices-j) * (secondCost + matrizAdj[s.sequence[i]][s.sequence[j+1]]) + subseqMatrix[j+1][vertices].custoAcumulado);
+      cost = partialCost + ( (vertices-j) * (secondCost + matrizAdj[s.sequence[i]][s.sequence[j+1]]) ) + subseqMatrix[j+1][vertices].custoAcumulado;
 
 
       if(cost < bestCost){
