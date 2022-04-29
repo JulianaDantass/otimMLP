@@ -356,7 +356,7 @@ void BuscaLocal (Solution& s, vector<vector<Subsequence>> &subseqMatrix){
 
     switch (NL[n]) {
       case 1: 
-        improved= BestImprovementSwap(s, subseqMatrix);    
+        // improved= BestImprovementSwap(s, subseqMatrix);    
         break;
       case 2: 
         improved= BestImprovement2Opt(s, subseqMatrix);  
@@ -365,10 +365,10 @@ void BuscaLocal (Solution& s, vector<vector<Subsequence>> &subseqMatrix){
         improved= BestImprovementOrOpt(s, subseqMatrix, 1);   //reinsertion    
         break;
       case 4:
-        improved= BestImprovementOrOpt(s, subseqMatrix, 2);   //Or-opt2      
+        // improved= BestImprovementOrOpt(s, subseqMatrix, 2);   //Or-opt2      //pode
         break;
       case 5:
-        improved= BestImprovementOrOpt(s, subseqMatrix, 3);   //Or-opt3      
+        // improved= BestImprovementOrOpt(s, subseqMatrix, 3);   //Or-opt3      
         break;
     }
     
@@ -432,6 +432,8 @@ int main(int argc, char** argv) {
         BuscaLocal(s, subseqMatrix);
         
         cout << "depois busca" << endl; 
+
+        getchar();
         sCustoAcum= subseqMatrix[s.sequence[0]][s.sequence[vertices-1]].custoAcumulado;
 
         if(sCustoAcum < bestCustoAcum){
