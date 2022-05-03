@@ -147,6 +147,8 @@ bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseqMatrix
 
     for (j= i + 1; j < vertices-1; j++){
       
+      
+
       partialCost = subseqMatrix[0][i-1].custoAcumulado + ( (j-i+1) * (subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]]) ) + subseqMatrix[j][i].custoAcumulado;
 
 
@@ -356,7 +358,7 @@ void BuscaLocal (Solution& s, vector<vector<Subsequence>> &subseqMatrix){
 
     switch (NL[n]) {
       case 1: 
-        // improved= BestImprovementSwap(s, subseqMatrix);    //erro 
+        improved= BestImprovementSwap(s, subseqMatrix);    //erro 
         break;
       case 2: 
         improved= BestImprovement2Opt(s, subseqMatrix);  
@@ -401,10 +403,10 @@ int main(int argc, char** argv) {
     vector<vector<Subsequence>> subseqMatrix(vertices, vector<Subsequence>(vertices)); 
 
 
-    if(vertices <= 150){
-      maxIterIls= vertices/ 2.0;
-    }else{
+    if(vertices < 100){
       maxIterIls= vertices;
+    }else{
+      maxIterIls= 100;
     }
     srand(time(NULL));
 
@@ -413,7 +415,8 @@ int main(int argc, char** argv) {
     }
 
 
-   maxIter= 1;
+   maxIter= 1; // 10 iteracoes
+
    for(i= 0; i < maxIter; i++){
       
       s= Construction(s, CL);
