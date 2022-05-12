@@ -17,6 +17,7 @@ void printData();
 
 struct Solution{
   vector<int> sequence;
+  double cost;
 };
 
 struct InsertionInfo{
@@ -25,14 +26,70 @@ struct InsertionInfo{
   double custo;
 };
 
-struct Subsequence{
-  double tempoTotal;
-  double custoAcumulado;
-};
+// struct Subsequence{
+//   double tempoTotal;
+//   double custoAcumulado;
+// };
 
 bool compares(InsertionInfo a, InsertionInfo b){  //funcao auxiliar na ordenacao dos custos
   return a.custo < b.custo;
 }
+
+
+struct Subsequence{
+  
+  double t, c;
+  int w;
+  int first, last;
+
+  inline static Subsequence Concatenate(Subsequence &sigma1, Subsequence &sigma2){
+
+    Subsequence sigma;
+
+    double temp= matrizAdj[sigma1.last][sigma2.first];
+    sigma.w= sigma1.w + sigma2.w;
+    sigma.c= sigma1.c + sigma2.c;
+    sigma.first = sigma1.first;
+    sigma.last = sigma2.last;
+
+    return sigma;
+  }
+
+
+};
+
+
+void UpdateAllSubseq(Solution &s, vector<vector<Subsequence>> &subseq_matrix){
+  
+  int n = s.sequence.size();
+
+
+  for (int i = 0; i < n; i++){
+
+    int v = s.sequence[i];
+    
+    subseq_matrix[i][i].w = (i > 0);
+    subseq_matrix[i][i].c = 0;
+    subseq_matrix[i][i].t = 0;
+    subseq_matrix[i][i].first = s.sequence[i];
+    subseq_matrix[i][i].last = s.sequence[i];
+  }
+
+  for (int i = 0; i < n; i++){
+    for (int j = i + 1; j < n; j++){
+      subseq_matrix[i][j] = Subsequence::Concatenate(subseq_matrix[i][j-1], subseq_matrix[j][j]);
+    }
+  }
+  
+  
+  for (int i = n - 1; i >= 0; i--){
+    for (int j = i - 1; j >= 0; j--){
+      subseq_matrix[i][j] = Subsequence::Concatenate(subseq_matrix[i][j+1], subseq_matrix[j][j]);
+    }  
+  }
+
+}
+
 
 vector<InsertionInfo> calcularCustoInsercao (Solution& s, std::vector<int>& CL){  //calcular o custo da insercao de cada vertice para Construcao
 
@@ -110,52 +167,37 @@ Solution Construction (Solution &s, vector<int> CL){  //gerando uma solucao inic
 }
 
 
-void updateSubseq(Solution &s, vector<vector<Subsequence>> &subseqMatrix){  //fazer o calculo do custo das subsequencias
 
-  int i, j;
-
-  int n= s.sequence.size();
-
-  for(i= 0; i < n-1; i++){                   
-    
-    subseqMatrix[i][i].tempoTotal= 0;
-    subseqMatrix[i][i].custoAcumulado= 0;
-
-      for(j= i+1; j < n-1; j++){    
-
-        subseqMatrix[i][j].tempoTotal= subseqMatrix[i][j-1].tempoTotal + matrizAdj[s.sequence[j-1]][s.sequence[j]];
-        subseqMatrix[i][j].custoAcumulado= subseqMatrix[i][j-1].custoAcumulado + subseqMatrix[i][j].tempoTotal;
-      }
-     
-   }
+bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseq_matrix){         //estrutura de vizinhança: SWAP ja alterada
 
 
-}
-
-
-bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseqMatrix){         //estrutura de vizinhança: SWAP ja alterada
-
-  double delta;
-  double bestDelta= 0;
   int best_i, best_j;
   int i, j;
   double partialCost, secondCost, cost;
 
-  double bestCost= subseqMatrix[0][vertices].custoAcumulado;
+  Subsequence sigma1, sigma2, sigma3, sigma4, sigma5;
+
+  
+  double bestCost= s.cost;
 
   for(i= 1; i < vertices - 1; i++) {
 
     for (j= i + 1; j < vertices-1; j++){
+
+      if(i == j-1){
+        sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[j][j]);
+        sigma1= Subsequence::Concatenate(sigma1, subseq_matrix[i][i]);
+        sigma3= Subsequence::Concatenate(sigma1, subseq_matrix[i][j+1]);
       
-      
+      }else{
 
-      partialCost = subseqMatrix[0][i-1].custoAcumulado + ( (j-i+1) * (subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]]) ) + subseqMatrix[j][i].custoAcumulado;
+        sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[j][j]);
+        sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[j][i+2]);
+        sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[i+2][j-1]);
+        sigma4= Subsequence::Concatenate(sigma3, subseq_matrix[j-1][j]);
+        sigma5= Subsequence::Concatenate(sigma4, subseq_matrix[j][j+1]);
+      }
 
-
-      secondCost= subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]] + subseqMatrix[j][i].tempoTotal;
-
-
-      cost = partialCost + ((vertices-j) * (partialCost + matrizAdj[s.sequence[i]][s.sequence[j+1]]) + subseqMatrix[j+1][vertices].custoAcumulado);
 
       if(cost < bestCost){
         bestCost= cost;
@@ -175,36 +217,33 @@ bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseqMatrix
 }
 
 
-bool BestImprovement2Opt (Solution& s, vector<vector<Subsequence>> &subseqMatrix){         //estrutura de vizinhança: 2opt    //alterada
+bool BestImprovement2Opt (Solution& s, vector<vector<Subsequence>> &subseq_matrix){         //estrutura de vizinhança: 2opt    //alterada
 
   double bestCost;
   int best_i, best_j;
   int i, j;
-  double partialCost, secondCost, cost;
 
-  bestCost= subseqMatrix[0][vertices].custoAcumulado;
+  Subsequence sigma1, sigma2;
 
 
-  for(i= 1; i < vertices - 2; i++) {
+  bestCost= s.cost;
+  for(i= 1; i < vertices - 2; i++){
 
     for (j= i + 2; j < vertices-1; j++){
       
-      partialCost= subseqMatrix[0][i-1].custoAcumulado + ( (j-i+1) * (subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]]) ) + subseqMatrix[j][i].custoAcumulado;
-                            
-      secondCost= subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]] + subseqMatrix[j][i].tempoTotal;
-
-      cost = partialCost + ( (vertices-j) * (secondCost + matrizAdj[s.sequence[i]][s.sequence[j+1]]) ) + subseqMatrix[j+1][vertices].custoAcumulado;
+      sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[j][i]);
+      sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[j+1][s.sequence.size()-1]);
 
 
-      if(cost < bestCost){
-        bestCost= cost;
+      if(sigma2.c < bestCost){
+        bestCost= sigma2.c;
         best_i= i;
         best_j= j;
       }
     }
   }
 
-  if (bestCost < subseqMatrix[0][vertices].custoAcumulado){
+  if (bestCost < s.cost){
 
     j= best_j;
     for(i= best_i; i < j; i++){               //for para inverter a subsequencia obtida anteriormente
@@ -400,7 +439,7 @@ int main(int argc, char** argv) {
     readData(argc, argv, &vertices, &matrizAdj);                                                      
 
     
-    vector<vector<Subsequence>> subseqMatrix(vertices, vector<Subsequence>(vertices)); 
+    vector<vector<Subsequence>> subseq_matrix(vertices, vector<Subsequence>(vertices)); 
 
 
     if(vertices < 100){
@@ -421,9 +460,8 @@ int main(int argc, char** argv) {
       
       s= Construction(s, CL);
 
-      updateSubseq(s, subseqMatrix);
+      UpdateAllSubseq(s, subseq_matrix);
 
-      bestCustoAcum= subseqMatrix[s.sequence[0]][s.sequence[vertices-1]].custoAcumulado;
       bestS= s;
 
       count= 0;
@@ -432,12 +470,11 @@ int main(int argc, char** argv) {
       while(count < maxIterIls){
 
         cout << "antes busca" << endl; 
-        BuscaLocal(s, subseqMatrix);
+        BuscaLocal(s, subseq_matrix);
         
         cout << "depois busca" << endl; 
 
         getchar();
-        sCustoAcum= subseqMatrix[s.sequence[0]][s.sequence[vertices-1]].custoAcumulado;
 
         if(sCustoAcum < bestCustoAcum){
           bestS= s;
