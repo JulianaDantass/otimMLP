@@ -207,7 +207,7 @@ bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseq_matri
     }
   }
 
-  if (bestDelta < subseqMatrix[0][vertices].custoAcumulado){
+  if (bestCost < s.cost){
     swap(s.sequence[best_i], s.sequence[best_j]);
     // s.custoSolucao= s.custoSolucao + bestDelta;
     return true;
@@ -258,15 +258,16 @@ bool BestImprovement2Opt (Solution& s, vector<vector<Subsequence>> &subseq_matri
 }
 
 
-bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseqMatrix, int quantity){   //as 3 outras estruturas de vizinhança 
+bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseq_matrix, int quantity){   //as 3 outras estruturas de vizinhança 
 
   double bestCost;
   int best_i, best_j;
   int i, j;
   double partialCost, secondCost, cost;
 
-  bestCost= subseqMatrix[0][vertices].custoAcumulado;
+  Subsequence sigma1, sigma2, sigma3;
 
+  bestCost= s.cost;
 
   switch(quantity){
     
@@ -277,20 +278,15 @@ bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseqMatri
         for (j= i + 1; j < vertices-1; j++){
 
           if(j== i+1){
-
-            partialCost= subseqMatrix[0][i-1].custoAcumulado + ( (j-i+1) * (subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]]) ) + matrizAdj[j][j+1];
-                                         
-     	      secondCost= subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]] + matrizAdj[i][j+1] + matrizAdj[j][i];
-
-            cost = partialCost + ( (vertices-j) * secondCost ) + subseqMatrix[j+1][vertices].custoAcumulado;
-
+            
+            sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[j][j]);
+            sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i]);
+            sigma3= Subsequence::Concatenate(sigma1, subseq_matrix[j+1][s.sequence.size()-1]);
           }
-          
-          partialCost= subseqMatrix[0][i-1].custoAcumulado + ( (j-i+1) * (subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j-1]]) ) + matrizAdj[j][i+1];
-                                         
-          secondCost= subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j-1]] + matrizAdj[i+1][j-1] + matrizAdj[j][i] ;
 
-          cost = partialCost + ( (vertices-j) * (secondCost + matrizAdj[s.sequence[i]][s.sequence[j+1]] ) + subseqMatrix[j+1][vertices].custoAcumulado);
+            sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+1][j-1]);
+            sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i]);
+            sigma3= Subsequence::Concatenate(sigma1, subseq_matrix[j+1][s.sequence.size()-1]);
 
           if(cost < bestCost){
             bestCost= cost;
@@ -314,16 +310,10 @@ bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseqMatri
       for(i= 1; i < vertices- 2; i++) {
 
         for (j= i + 2; j < vertices- 1; j++){
-          
-          partialCost = subseqMatrix[0][i-1].custoAcumulado + ( ( j-i+1) * (subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j-1]]))
-                        + subseqMatrix[j][j-1].custoAcumulado + matrizAdj[i][i+1];
-
-
-          secondCost = subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j-1]] + subseqMatrix[j][j-1].tempoTotal;
-
-
-          cost = partialCost + ((vertices-j) * (secondCost + (2 * matrizAdj[s.sequence[i]][s.sequence[j]]) ) + matrizAdj[j-1][j] + matrizAdj[i][i+1]) + matrizAdj[i+1][j+1] + subseqMatrix[j+1][vertices].custoAcumulado;
-
+        
+            sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+2][j]);
+            sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i+1]);
+            sigma3= Subsequence::Concatenate(sigma1, subseq_matrix[j+1][s.sequence.size()-1]);
 
             if(cost < bestCost){
               bestCost= cost;
@@ -333,7 +323,7 @@ bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseqMatri
         }
       }
 
-      if (bestCost < subseqMatrix[0][vertices].custoAcumulado){
+      if (bestCost < s.cost){
         s.sequence.insert(s.sequence.begin() + best_j + 2, s.sequence[best_i]);
         s.sequence.insert(s.sequence.begin() + best_j + 3, s.sequence[best_i+1]);
         s.sequence.erase(s.sequence.begin() + (best_i + 1));
@@ -341,24 +331,18 @@ bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseqMatri
         // s.custoSolucao= s.custoSolucao + bestDelta;
         
         return true;
-      }
-      return false;
+      }                                                                            
+      return false;                                                               
 
     case 3:      //método: OR-OPT-3
 
       for(i= 1; i < vertices - 3; i++) {
 
-        partialCost= - matrizAdj[s.sequence[i-1]][s.sequence[i]] - matrizAdj[s.sequence[i+2]][s.sequence[i+3]] + matrizAdj[s.sequence[i-1]][s.sequence[i+3]];
+        for (j= i + 3; j < vertices- 1; j++){
 
-        for (j= i + 3; j < vertices - 2; j++){
-          
-          partialCost=  subseqMatrix[0][i-1].custoAcumulado + ( (j-i+1) * (subseqMatrix[0][i-1].tempoTotal + matrizAdj[s.sequence[i-1]][s.sequence[j]]) ) + 	matrizAdj[j][i] + subseqMatrix[i][i+1].custoAcumulado;
-
-
-          secondCost= subseqMatrix[0][i-1].tempoTotal + ( 2 * matrizAdj[s.sequence[i-1]][s.sequence[j]] ) + matrizAdj[i][j] + subseqMatrix[i][j-1].tempoTotal;
-
-          cost = partialCost + ( (vertices-j) * (secondCost + matrizAdj[s.sequence[j-1]]	[s.sequence[j+1]] ) + subseqMatrix[j+1][vertices].custoAcumulado);
-
+          sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+3][j]);
+          sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i+2]);
+          sigma3= Subsequence::Concatenate(sigma1, subseq_matrix[j+1][s.sequence.size()-1]);
       
 
           if(cost < bestCost){
@@ -366,11 +350,12 @@ bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseqMatri
             best_i= i;
             best_j= j;
           }
-        }
-        
-      }
 
-      if (bestCost < subseqMatrix[0][vertices].custoAcumulado){
+        }
+      }
+        
+
+      if (bestCost < s.cost){
         s.sequence.insert(s.sequence.begin() + best_j + 3, s.sequence[best_i]);
         s.sequence.insert(s.sequence.begin() + best_j + 4, s.sequence[best_i+1]);
         s.sequence.insert(s.sequence.begin() + best_j + 5, s.sequence[best_i+2]);
