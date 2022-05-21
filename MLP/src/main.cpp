@@ -17,7 +17,6 @@ void printData();
 
 struct Solution{
   vector<int> sequence;
-  double cost;
 };
 
 struct InsertionInfo{
@@ -47,9 +46,10 @@ struct Subsequence{
     Subsequence sigma;
 
     double temp= matrizAdj[sigma1.last][sigma2.first];
-    sigma.w= sigma1.w + sigma2.w;
-    sigma.c= sigma1.c + sigma2.c;
-    sigma.first = sigma1.first;
+    sigma.w = sigma1.w + sigma2.w;
+    sigma.t= sigma1.t + temp + sigma2.t;
+    sigma.c = sigma1.c + sigma2.w * (sigma1.t + temp) + sigma2.c;
+    sigma.first = sigma1.first; 
     sigma.last = sigma2.last;
 
     return sigma;
@@ -59,7 +59,7 @@ struct Subsequence{
 };
 
 
-void UpdateAllSubseq(Solution &s, vector<vector<Subsequence>> &subseq_matrix){
+void UpdateAllSubseq(Solution s, vector<vector<Subsequence>> &subseq_matrix){
   
   int n = s.sequence.size();
 
@@ -73,11 +73,15 @@ void UpdateAllSubseq(Solution &s, vector<vector<Subsequence>> &subseq_matrix){
     subseq_matrix[i][i].t = 0;
     subseq_matrix[i][i].first = s.sequence[i];
     subseq_matrix[i][i].last = s.sequence[i];
+
+    
   }
 
   for (int i = 0; i < n; i++){
     for (int j = i + 1; j < n; j++){
       subseq_matrix[i][j] = Subsequence::Concatenate(subseq_matrix[i][j-1], subseq_matrix[j][j]);
+
+    
     }
   }
   
@@ -85,10 +89,30 @@ void UpdateAllSubseq(Solution &s, vector<vector<Subsequence>> &subseq_matrix){
   for (int i = n - 1; i >= 0; i--){
     for (int j = i - 1; j >= 0; j--){
       subseq_matrix[i][j] = Subsequence::Concatenate(subseq_matrix[i][j+1], subseq_matrix[j][j]);
+
+     
     }  
   }
 
 }
+
+// void startSubseq(Solution s, vector<vector<Subsequence>> &subseq_matrix){
+  
+//   int n = s.sequence.size();
+
+
+//   for (int i = 0; i < n-1; i++){
+
+//     for (int j = 0; j < n-1; j++){
+
+//       subseq_matrix[i][j].c = 1;
+//       subseq_matrix[i][j].w = 1;
+//       subseq_matrix[i][j].t = 1;
+//     }
+    
+//   }
+
+// }
 
 
 vector<InsertionInfo> calcularCustoInsercao (Solution& s, std::vector<int>& CL){  //calcular o custo da insercao de cada vertice para Construcao
@@ -178,7 +202,7 @@ bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseq_matri
   Subsequence sigma1, sigma2, sigma3, sigma4, sigma5;
 
   
-  double bestCost= s.cost;
+  double bestCost= 0;
 
   for(i= 1; i < vertices - 1; i++) {
 
@@ -192,12 +216,10 @@ bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseq_matri
       }else{
 
         sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[j][j]);
-        sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[j][i+2]);
-        sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[i+2][j-1]);
-        sigma4= Subsequence::Concatenate(sigma3, subseq_matrix[j-1][j]);
-        sigma5= Subsequence::Concatenate(sigma4, subseq_matrix[j][j+1]);
+        sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i+2][j-1]);
+        sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[i][i]);
+        sigma4= Subsequence::Concatenate(sigma3, subseq_matrix[j+1][vertices]);
       }
-
 
       if(cost < bestCost){
         bestCost= cost;
@@ -207,7 +229,7 @@ bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseq_matri
     }
   }
 
-  if (bestCost < s.cost){
+  if (bestCost < 0){
     swap(s.sequence[best_i], s.sequence[best_j]);
     // s.custoSolucao= s.custoSolucao + bestDelta;
     return true;
@@ -226,7 +248,7 @@ bool BestImprovement2Opt (Solution& s, vector<vector<Subsequence>> &subseq_matri
   Subsequence sigma1, sigma2;
 
 
-  bestCost= s.cost;
+  bestCost= 0;
   for(i= 1; i < vertices - 2; i++){
 
     for (j= i + 2; j < vertices-1; j++){
@@ -243,7 +265,7 @@ bool BestImprovement2Opt (Solution& s, vector<vector<Subsequence>> &subseq_matri
     }
   }
 
-  if (bestCost < s.cost){
+  if (bestCost < 0){
 
     j= best_j;
     for(i= best_i; i < j; i++){               //for para inverter a subsequencia obtida anteriormente
@@ -267,7 +289,7 @@ bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseq_matr
 
   Subsequence sigma1, sigma2, sigma3;
 
-  bestCost= s.cost;
+  bestCost= 0;
 
   switch(quantity){
     
@@ -323,7 +345,7 @@ bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseq_matr
         }
       }
 
-      if (bestCost < s.cost){
+      if (bestCost < 0){
         s.sequence.insert(s.sequence.begin() + best_j + 2, s.sequence[best_i]);
         s.sequence.insert(s.sequence.begin() + best_j + 3, s.sequence[best_i+1]);
         s.sequence.erase(s.sequence.begin() + (best_i + 1));
@@ -355,7 +377,7 @@ bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseq_matr
       }
         
 
-      if (bestCost < s.cost){
+      if (bestCost < 0){
         s.sequence.insert(s.sequence.begin() + best_j + 3, s.sequence[best_i]);
         s.sequence.insert(s.sequence.begin() + best_j + 4, s.sequence[best_i+1]);
         s.sequence.insert(s.sequence.begin() + best_j + 5, s.sequence[best_i+2]);
@@ -410,6 +432,95 @@ void BuscaLocal (Solution& s, vector<vector<Subsequence>> &subseqMatrix){
 
  }
 
+ Solution Pertubacao (Solution s){  
+
+  int subseqMax;
+  int subseq1, subseq2;
+  int index1, index2;
+  int i, times;
+  bool changed= false;
+  int large, small;
+
+  if (vertices <= 29){
+    subseq1= subseq2= 2;
+
+    large= small= subseq1;
+  }else{
+     subseqMax= dimension / 10;
+     subseqMax--;       //recurso utilizado para facilitar o uso do rand
+
+     subseq1= rand() % subseqMax + 2;
+     subseq2= rand() % subseqMax + 2;
+
+     if(subseq1 > subseq2){
+      large= subseq1;
+      small= subseq2;
+      changed = true;
+    }else{
+      large= subseq2;
+      small= subseq1;
+    }
+  }
+ 
+  while(1){
+    index1= rand() % dimension + 1;
+
+    if(index1 <= dimension-subseq2-subseq1){
+        break;
+    }
+  }                                            
+  while(1){
+    index2= rand() % dimension + index1 + subseq1;      //pq o index2 tem q ser sorteado a partir do indice index1+subseq1;
+
+    if(index2 <= dimension-subseq2){
+      break;
+    }
+  }
+
+  
+  if( (index1 + subseq1) == index2 ){
+    s.custoSolucao= s.custoSolucao - matrizAdj[s.sequence[index1-1]][s.sequence[index1]] - matrizAdj[s.sequence[index1+subseq1-1]][s.sequence[index2]]
+                                   - matrizAdj[s.sequence[index2+subseq2-1]][s.sequence[index2+subseq2]]
+                                   + matrizAdj[s.sequence[index1-1]][s.sequence[index2]] + matrizAdj[s.sequence[index2+subseq2-1]][s.sequence[index1]]
+                                   + matrizAdj[s.sequence[index1+subseq1-1]][s.sequence[index2+subseq2]];
+  }else{
+    s.custoSolucao= s.custoSolucao - matrizAdj[s.sequence[index1-1]][s.sequence[index1]] - matrizAdj[s.sequence[index1+subseq1-1]][s.sequence[index1+subseq1]]
+                                   - matrizAdj[s.sequence[index2-1]][s.sequence[index2]] - matrizAdj[s.sequence[index2+subseq2-1]][s.sequence[index2+subseq2]]
+                                   + matrizAdj[s.sequence[index1-1]][s.sequence[index2]] + matrizAdj[s.sequence[index2+subseq2-1]][s.sequence[index1+subseq1]]
+                                   + matrizAdj[s.sequence[index2-1]][s.sequence[index1]] + matrizAdj[s.sequence[index1+subseq1-1]][s.sequence[index2+subseq2]];
+  }
+
+  for(i= 0; i < small; i++){
+    swap(s.sequence[index1+i], s.sequence[index2+i]);
+  }
+
+  if(subseq1 != subseq2){
+    
+    times= large- small;
+
+    i= 0;
+    if(changed){   
+        while(times){
+          s.sequence.insert(s.sequence.begin() + index2 + subseq2, s.sequence[index1 + subseq2] );
+          s.sequence.erase(s.sequence.begin() + index1 + subseq2);
+          times--;
+          i++;
+        }
+
+    }else{
+      while(times){
+        s.sequence.insert(s.sequence.begin() + index1 + subseq1 + i, s.sequence[index2 + subseq1+i] );
+        s.sequence.erase(s.sequence.begin() + index2 + subseq1 + i+1);
+        times--;
+        i++;
+      }  
+     }
+     
+    }
+
+  return s;
+}
+
 
 int main(int argc, char** argv) {
 
@@ -424,7 +535,7 @@ int main(int argc, char** argv) {
     readData(argc, argv, &vertices, &matrizAdj);                                                      
 
     
-    vector<vector<Subsequence>> subseq_matrix(vertices, vector<Subsequence>(vertices)); 
+    vector<vector<Subsequence>> subseq_matrix(vertices+1, vector<Subsequence>(vertices+1)); 
 
 
     if(vertices < 100){
@@ -438,6 +549,7 @@ int main(int argc, char** argv) {
       CL.push_back(i);
     }
 
+    
 
    maxIter= 1; // 10 iteracoes
 
@@ -445,6 +557,8 @@ int main(int argc, char** argv) {
       
       s= Construction(s, CL);
 
+  
+      // startSubseq(s, subseq_matrix);
       UpdateAllSubseq(s, subseq_matrix);
 
       bestS= s;
@@ -455,7 +569,7 @@ int main(int argc, char** argv) {
       while(count < maxIterIls){
 
         cout << "antes busca" << endl; 
-        BuscaLocal(s, subseq_matrix);
+        // BuscaLocal(s, subseq_matrix);
         
         cout << "depois busca" << endl; 
 
