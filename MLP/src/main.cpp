@@ -499,7 +499,7 @@ void BuscaLocal (Solution& s, vector<vector<Subsequence>> &subseqMatrix){
           s.sequence.erase(s.sequence.begin() + index1 + subseq2);
           times--;
           i++;
-        }
+        } /// 
 
     }else{
       while(times){
