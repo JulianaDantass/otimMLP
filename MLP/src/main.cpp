@@ -46,7 +46,7 @@ struct Subsequence{
 
     Subsequence sigma;
 
-    double temp= matrizAdj[sigma1.last][sigma2.first];
+    double temp = matrizAdj[sigma1.last][sigma2.first];
     sigma.w = sigma1.w + sigma2.w;
     sigma.t= sigma1.t + temp + sigma2.t;
     sigma.c = sigma1.c + sigma2.w * (sigma1.t + temp) + sigma2.c;
@@ -63,7 +63,6 @@ struct Subsequence{
 void UpdateAllSubseq(Solution s, vector<vector<Subsequence>> &subseq_matrix){
   
   int n = s.sequence.size();
-
 
   for (int i = 0; i < n; i++){
 
@@ -170,6 +169,8 @@ Solution Construction (Solution &s, vector<int> CL){  //gerando uma solucao inic
 
   }
 
+  cout << s.sequence.size() << endl;
+
   return s;
 }
 
@@ -187,14 +188,15 @@ bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseq_matri
   
   double bestCost= subseq_matrix[0][vertices].c;
 
-  for(i= 1; i < vertices - 1; i++) {
-
-    for (j= i + 1; j < vertices-1; j++){
+  for(i= 1; i < vertices - 1; i++) {           //
+ 
+    for (j= i + 1; j < vertices-1; j++){           
 
       if(i == j-1){
         sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[j][j]);
         sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i]);
-        sigma4= Subsequence::Concatenate(sigma1, subseq_matrix[i][j+1]);
+        sigma4= Subsequence::Concatenate(sigma2, subseq_matrix[j+1][vertices]);
+
       
       }else{
 
@@ -209,13 +211,19 @@ bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseq_matri
         best_i= i;
         best_j= j;
       }
+
+      
+      
     }
   }
 
   if (bestCost < subseq_matrix[0][vertices].c){
-
+    
+    cout << "best cost " << bestCost << endl;
     swap(s.sequence[best_i], s.sequence[best_j]);
     UpdateAllSubseq(s, subseq_matrix);
+
+    cout << "subseq " << subseq_matrix[0][vertices].c << endl;
 
     return true;
   }
@@ -240,7 +248,7 @@ bool BestImprovement2Opt (Solution& s, vector<vector<Subsequence>> &subseq_matri
     for (j= i + 2; j < vertices-1; j++){
       
       sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[j][i]);
-      sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[j+1][s.sequence.size()-1]);
+      sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[j+1][vertices-1]);
 
 
       if(sigma2.c < bestCost){
@@ -257,6 +265,13 @@ bool BestImprovement2Opt (Solution& s, vector<vector<Subsequence>> &subseq_matri
     for(i= best_i; i < j; i++){               //for para inverter a subsequencia obtida anteriormente
       swap(s.sequence[i], s.sequence[j]);
       j--;
+    }
+
+    double custo= 0;
+    for(int j= 0; j < s.sequence.size()-1; j++){
+
+      custo += (s.sequence.size()-1 - j) * matrizAdj[s.sequence[j]][s.sequence[j+1]];
+
     }
 
     UpdateAllSubseq(s, subseq_matrix);
@@ -390,15 +405,26 @@ bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseq_matr
 void BuscaLocal (Solution& s, vector<vector<Subsequence>> &subseqMatrix){
 
   vector<int>NL= {1, 2, 3, 4, 5};
-  bool improved= false;
+  
+  int i;
   
   while(!NL.empty()){
     
     int n= rand() % NL.size();
 
+    bool improved= false;
+
     switch (NL[n]) {
       case 1: 
         // improved= BestImprovementSwap(s, subseqMatrix);    //erro 
+
+        // for(i= 0; i < s.sequence.size(); i++){ 
+        
+        //   cout << s.sequence[i] << " ";
+        // }
+        // cout << endl;
+
+        // getchar();
         break;
       case 2: 
         // improved= BestImprovement2Opt(s, subseqMatrix);  
@@ -406,22 +432,29 @@ void BuscaLocal (Solution& s, vector<vector<Subsequence>> &subseqMatrix){
       case 3:
         improved= BestImprovementOrOpt(s, subseqMatrix, 1);   //reinsertion    
         break;
-      case 4:
-        improved= BestImprovementOrOpt(s, subseqMatrix, 2);   //Or-opt2      
-        break;
-      case 5:
-        // improved= BestImprovementOrOpt(s, subseqMatrix, 3);   //Or-opt3      
-        break;
+      // case 4:
+      //   improved= BestImprovementOrOpt(s, subseqMatrix, 2);   //Or-opt2      
+      //   break;
+      // case 5:
+      //   improved= BestImprovementOrOpt(s, subseqMatrix, 3);   //Or-opt3      
+      //   break;
     }
     
 
     if(improved){
       NL={1, 2, 3, 4, 5};
-
+      
     }else{
       NL.erase(NL.begin() + n);
     }
-    
+
+    cout << "custo " << subseqMatrix[0][vertices].c << endl;
+
+    // for(i= 0; i < NL.size(); i++){ 
+        
+    //       cout << NL[i] << " ";
+    // }
+    // cout << endl;
   } 
 
  }
@@ -527,11 +560,12 @@ int main(int argc, char** argv) {
     int maxIter, maxIterIls;
     int i, count, j;
     vector<int> CL;    
+    double custo= 0;
 
     readData(argc, argv, &vertices, &matrizAdj);                                                      
 
     
-    vector<vector<Subsequence>> subseq_matrix(vertices+1, vector<Subsequence>(vertices+1)); 
+    
 
 
     if(vertices < 100){
@@ -551,12 +585,38 @@ int main(int argc, char** argv) {
 
    for(i= 0; i < maxIter; i++){
       
+      s.sequence.clear();
+
+      vector<vector<Subsequence>> subseq_matrix(vertices+1, vector<Subsequence>(vertices+1)); 
+
       s= Construction(s, CL);
+
+      cout << "main " << s.sequence.size();
+
+      // for(i= 0; i < vertices; i++){ 
+        
+      //   s.sequence.push_back(i+1);
+      // }
+
+      // s.sequence.push_back(1);
+
+      custo= 0;
+      for(int j= 0; j < s.sequence.size()-1; j++){
+
+        custo += (s.sequence.size()-1 - j) * matrizAdj[s.sequence[j]][s.sequence[j+1]];
+
+      }
+
 
       UpdateAllSubseq(s, subseq_matrix);
 
-      bestCustoAcum= subseq_matrix[0][vertices].c;    //fica como melhor solução, a primeira gerada na construcao
+     
+      
 
+      bestCustoAcum= subseq_matrix[0][vertices].c;    //fica como melhor solução, a primeira gerada na construcao
+      
+      cout << " na marra " << custo << endl;
+      cout << "update " << bestCustoAcum << endl;
       bestS= s;
 
 
@@ -568,6 +628,8 @@ int main(int argc, char** argv) {
         BuscaLocal(s, subseq_matrix);
       
         cout << "passou da busca" << endl; 
+
+        getchar();
 
         if(subseq_matrix[0][vertices].c < bestCustoAcum){
           bestS= s;
