@@ -205,7 +205,7 @@ bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseq_matri
       }
 
       if(sigma4.c < bestCost){
-        bestCost= cost;
+        bestCost= sigma4.c;
         best_i= i;
         best_j= j;
       }
@@ -273,7 +273,7 @@ bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseq_matr
   double bestCost;
   int best_i, best_j;
   int i, j;
-  double partialCost, secondCost, cost;
+  double partialCost, secondCost;
 
   Subsequence sigma1, sigma2, sigma3;
 
@@ -294,13 +294,13 @@ bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseq_matr
             sigma3= Subsequence::Concatenate(sigma1, subseq_matrix[j+1][s.sequence.size()-1]);
           }
 
-            sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+1][j-1]);
+            sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+1][j]);
             sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i]);
             sigma3= Subsequence::Concatenate(sigma1, subseq_matrix[j+1][s.sequence.size()-1]);
 
           if(sigma3.c < bestCost){
 
-            bestCost= cost;
+            bestCost= sigma3.c;
             best_i= i;
             best_j= j;
           }
@@ -329,7 +329,7 @@ bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseq_matr
             sigma3= Subsequence::Concatenate(sigma1, subseq_matrix[j+1][s.sequence.size()-1]);
 
             if(sigma3.c < bestCost){
-              bestCost= cost;
+              bestCost= sigma3.c;
               best_i= i;
               best_j= j;
             }
@@ -361,7 +361,7 @@ bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseq_matr
       
 
           if(sigma3.c < bestCost){
-            bestCost= cost;
+            bestCost= sigma3.c;
             best_i= i;
             best_j= j;
           }
@@ -370,7 +370,7 @@ bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseq_matr
       }
         
 
-      if (bestCost < 0){
+      if (bestCost < subseq_matrix[0][vertices].c){
         s.sequence.insert(s.sequence.begin() + best_j + 3, s.sequence[best_i]);
         s.sequence.insert(s.sequence.begin() + best_j + 4, s.sequence[best_i+1]);
         s.sequence.insert(s.sequence.begin() + best_j + 5, s.sequence[best_i+2]);
@@ -398,10 +398,10 @@ void BuscaLocal (Solution& s, vector<vector<Subsequence>> &subseqMatrix){
 
     switch (NL[n]) {
       case 1: 
-        improved= BestImprovementSwap(s, subseqMatrix);    //erro 
+        // improved= BestImprovementSwap(s, subseqMatrix);    //erro 
         break;
       case 2: 
-        improved= BestImprovement2Opt(s, subseqMatrix);  
+        // improved= BestImprovement2Opt(s, subseqMatrix);  
         break;
       case 3:
         improved= BestImprovementOrOpt(s, subseqMatrix, 1);   //reinsertion    
@@ -410,7 +410,7 @@ void BuscaLocal (Solution& s, vector<vector<Subsequence>> &subseqMatrix){
         improved= BestImprovementOrOpt(s, subseqMatrix, 2);   //Or-opt2      
         break;
       case 5:
-        improved= BestImprovementOrOpt(s, subseqMatrix, 3);   //Or-opt3      
+        // improved= BestImprovementOrOpt(s, subseqMatrix, 3);   //Or-opt3      
         break;
     }
     
@@ -563,12 +563,15 @@ int main(int argc, char** argv) {
       count= 0;
       while(count < maxIterIls){
 
+        cout << "entrou da busca" << endl; 
+
         BuscaLocal(s, subseq_matrix);
       
         cout << "passou da busca" << endl; 
 
         if(subseq_matrix[0][vertices].c < bestCustoAcum){
           bestS= s;
+          bestCustoAcum= subseq_matrix[0][vertices].c;   
           count= 0;
         }
         
