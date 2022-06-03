@@ -26,11 +26,6 @@ struct InsertionInfo{
   double custo;
 };
 
-// struct Subsequence{
-//   double tempoTotal;
-//   double custoAcumulado;
-// };
-
 bool compares(InsertionInfo a, InsertionInfo b){  //funcao auxiliar na ordenacao dos custos
   return a.custo < b.custo;
 }
@@ -124,8 +119,9 @@ vector<InsertionInfo> calcularCustoInsercao (Solution& s, std::vector<int>& CL){
   return custoInsercao;
 }
 
-Solution Construction (Solution &s, vector<int> CL){  //gerando uma solucao inicial
+Solution Construction (vector<int> CL){  //gerando uma solucao inicial
 
+  Solution s;
   int indexRandom, i, j;  
   
   s.sequence.push_back(1);
@@ -169,8 +165,6 @@ Solution Construction (Solution &s, vector<int> CL){  //gerando uma solucao inic
 
   }
 
-  cout << s.sequence.size() << endl;
-
   return s;
 }
 
@@ -201,7 +195,7 @@ bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseq_matri
       }else{
 
         sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[j][j]);
-        sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i+2][j-1]);
+        sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i+1][j-1]);
         sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[i][i]);
         sigma4= Subsequence::Concatenate(sigma3, subseq_matrix[j+1][vertices]);
       }
@@ -211,19 +205,14 @@ bool BestImprovementSwap (Solution& s, vector<vector<Subsequence>> &subseq_matri
         best_i= i;
         best_j= j;
       }
-
-      
       
     }
   }
 
   if (bestCost < subseq_matrix[0][vertices].c){
     
-    cout << "best cost " << bestCost << endl;
     swap(s.sequence[best_i], s.sequence[best_j]);
     UpdateAllSubseq(s, subseq_matrix);
-
-    cout << "subseq " << subseq_matrix[0][vertices].c << endl;
 
     return true;
   }
@@ -248,7 +237,7 @@ bool BestImprovement2Opt (Solution& s, vector<vector<Subsequence>> &subseq_matri
     for (j= i + 2; j < vertices-1; j++){
       
       sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[j][i]);
-      sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[j+1][vertices-1]);
+      sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[j+1][vertices]);
 
 
       if(sigma2.c < bestCost){
@@ -267,19 +256,24 @@ bool BestImprovement2Opt (Solution& s, vector<vector<Subsequence>> &subseq_matri
       j--;
     }
 
-    double custo= 0;
-    for(int j= 0; j < s.sequence.size()-1; j++){
-
-      custo += (s.sequence.size()-1 - j) * matrizAdj[s.sequence[j]][s.sequence[j+1]];
-
-    }
-
     UpdateAllSubseq(s, subseq_matrix);
 
     return true;
   }
 
   return false; 
+}
+
+inline void reinsert(std::vector<int> &vec, int i, int j, int pos){
+    std::vector<int> seq (vec.begin() + i, vec.begin() +j+1);
+    if(pos < i){
+        vec.erase(vec.begin() + i, vec.begin() + j+1);
+        vec.insert(vec.begin() + pos, seq.begin(), seq.end());
+    }else{
+        vec.insert(vec.begin() + pos, seq.begin(), seq.end());
+        vec.erase(vec.begin() + i, vec.begin() + j+1);
+    }
+
 }
 
 
@@ -292,114 +286,188 @@ bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseq_matr
 
   Subsequence sigma1, sigma2, sigma3;
 
+  int n= quantity-1; 
+
   bestCost= subseq_matrix[0][vertices].c;
 
-  switch(quantity){
-    
-    case 1:             //método: REINSERTION
 
-      for(i= 1; i < vertices-1; i++) {
+  for(i= 1; i < vertices-quantity; i++) {
 
-        for (j= i + 1; j < vertices-1; j++){
+      for (j= 1; j < vertices-1; j++){    
 
-          if(j== i+1){
-            
-            sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[j][j]);
-            sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i]);
-            sigma3= Subsequence::Concatenate(sigma1, subseq_matrix[j+1][s.sequence.size()-1]);
-          }
+        if(j < i){
+          sigma1= Subsequence::Concatenate(subseq_matrix[0][j-1], subseq_matrix[i][i+n]);
+          sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[j][i-1]);
+          sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[i+n+1][s.sequence.size()-1]);
+        
+        }else if(j > i+n+1){
 
-            sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+1][j]);
-            sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i]);
-            sigma3= Subsequence::Concatenate(sigma1, subseq_matrix[j+1][s.sequence.size()-1]);
+          sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+n+1][j-1]);
+          sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i+n]);
+          sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[j][s.sequence.size()-1]);
+        
+        }else{
+          continue;
+        }
 
-          if(sigma3.c < bestCost){
+        if(sigma3.c < bestCost){
 
             bestCost= sigma3.c;
             best_i= i;
-            best_j= j;
-          }
+            best_j= j-1;
         }
       }
+  }
 
-      if (bestCost < subseq_matrix[0][vertices].c){
 
-        s.sequence.insert(s.sequence.begin() + best_j + 1, s.sequence[best_i]);
-        s.sequence.erase(s.sequence.begin() + best_i);
+  if (bestCost < subseq_matrix[0][vertices].c){
+
+      reinsert(s.sequence, best_i, best_i+n, best_j);
+      //if(quantity == 1){
+
         
+
+     // }else if(quantity == 2){
+
+    //     s.sequence.insert(s.sequence.begin() + best_j + 2, s.sequence[best_i]);
+    //     s.sequence.insert(s.sequence.begin() + best_j + 3, s.sequence[best_i+1]);
+    //     s.sequence.erase(s.sequence.begin() + (best_i + 1));
+    //     s.sequence.erase(s.sequence.begin() + best_i);
+
+    //  // }else{
+
+    //     s.sequence.insert(s.sequence.begin() + best_j + 3, s.sequence[best_i]);
+    //     s.sequence.insert(s.sequence.begin() + best_j + 4, s.sequence[best_i+1]);
+    //     s.sequence.insert(s.sequence.begin() + best_j + 5, s.sequence[best_i+2]);
+    //     s.sequence.erase(s.sequence.begin() + (best_i + 2));
+    //     s.sequence.erase(s.sequence.begin() + (best_i + 1));
+    //     s.sequence.erase(s.sequence.begin() + best_i);
+    //   }
+
         UpdateAllSubseq(s, subseq_matrix);
+
+        if(bestCost != subseq_matrix[0][vertices].c){
+          cout << "quebrou o alg de mororo";
+          getchar();
+        }
         
         return true;
       }
       return false;
 
-    case 2:          //método: OR-OPT-2
+//   switch(quantity){
+    
+//     case 1:             //método: REINSERTION
 
-      for(i= 1; i < vertices- 2; i++) {
+//       for(i= 1; i < vertices-1; i++) {
 
-        for (j= i + 2; j < vertices- 1; j++){
+//        for (j= i+1; j < vertices-1; j++){    
+
+//            if(j== i+1){
+            
+//              sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[j][j]);
+//              sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i]);
+//              sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[j+1][s.sequence.size()-1]);
+
+
+//            }else{
+
+//              sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+1][j]);
+//              sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i]);
+//              sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[j+1][s.sequence.size()-1]);
+//             }
+
+//            if(sigma3.c < bestCost){
+
+//              bestCost= sigma3.c;
+//              best_i= i;
+//             best_j= j;
+//          }
+//        }
+//        }
+
+//       if (bestCost < subseq_matrix[0][vertices].c){
+
+//         s.sequence.insert(s.sequence.begin() + best_j + 1, s.sequence[best_i]);
+//          s.sequence.erase(s.sequence.begin() + best_i);
         
-            sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+2][j]);
-            sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i+1]);
-            sigma3= Subsequence::Concatenate(sigma1, subseq_matrix[j+1][s.sequence.size()-1]);
-
-            if(sigma3.c < bestCost){
-              bestCost= sigma3.c;
-              best_i= i;
-              best_j= j;
-            }
-        }
-      }
-
-      if (bestCost < subseq_matrix[0][vertices].c){
-
-        s.sequence.insert(s.sequence.begin() + best_j + 2, s.sequence[best_i]);
-        s.sequence.insert(s.sequence.begin() + best_j + 3, s.sequence[best_i+1]);
-        s.sequence.erase(s.sequence.begin() + (best_i + 1));
-        s.sequence.erase(s.sequence.begin() + best_i);
+//          UpdateAllSubseq(s, subseq_matrix);
         
-        UpdateAllSubseq(s, subseq_matrix);    //fazer o update dos custos da nova solucao melhorada
+//          return true;
+//        }
+//        return false;
+
+//      case 2:          //método: OR-OPT-2
+
+//       for(i= 1; i < vertices- 2; i++) {
+
+//          for (j= i + 2; j < vertices- 1; j++){
         
-        return true;
-      }                                                                            
-      return false;                                                               
+//              sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+2][j]);
+//             sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i+1]);
+//              sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[j+1][s.sequence.size()-1]);
 
-    case 3:      //método: OR-OPT-3
+//             if(sigma3.c < bestCost){
+//               bestCost= sigma3.c;
+//               best_i= i;
+//               best_j= j;
+//             }
+//         }
+//       }
 
-      for(i= 1; i < vertices - 3; i++) {
+//       if (bestCost < subseq_matrix[0][vertices].c){
 
-        for (j= i + 3; j < vertices- 1; j++){
+//         s.sequence.insert(s.sequence.begin() + best_j + 2, s.sequence[best_i]);
+//         s.sequence.insert(s.sequence.begin() + best_j + 3, s.sequence[best_i+1]);
+//         s.sequence.erase(s.sequence.begin() + (best_i + 1));
+//         s.sequence.erase(s.sequence.begin() + best_i);
+        
+//         UpdateAllSubseq(s, subseq_matrix);    //fazer o update dos custos da nova solucao melhorada
+        
+//         return true;
+//       }                                                                            
+//       return false;                                                               
 
-          sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+3][j]);
-          sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i+2]);
-          sigma3= Subsequence::Concatenate(sigma1, subseq_matrix[j+1][s.sequence.size()-1]);
+//     case 3:      //método: OR-OPT-3                                       //1  2   3  4  5  6  7  1
+//                                                                           //1  5  2  3   4  6  7  1 
+//       for(i= 1; i < vertices - 3; i++) {
+
+//         for (j= i + 3; j < vertices- 1; j++){
+
+//           sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+3][j]);
+//           sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i+2]);
+//           sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[j+1][s.sequence.size()-1]);
       
 
-          if(sigma3.c < bestCost){
-            bestCost= sigma3.c;
-            best_i= i;
-            best_j= j;
-          }
+//           if(sigma3.c < bestCost){
+//             bestCost= sigma3.c;
+//             best_i= i;
+//             best_j= j;
+//           }
 
-        }
-      }
+//         }
+//       }
         
 
-      if (bestCost < subseq_matrix[0][vertices].c){
-        s.sequence.insert(s.sequence.begin() + best_j + 3, s.sequence[best_i]);
-        s.sequence.insert(s.sequence.begin() + best_j + 4, s.sequence[best_i+1]);
-        s.sequence.insert(s.sequence.begin() + best_j + 5, s.sequence[best_i+2]);
-        s.sequence.erase(s.sequence.begin() + (best_i + 2));
-        s.sequence.erase(s.sequence.begin() + (best_i + 1));
-        s.sequence.erase(s.sequence.begin() + best_i);
+//       if (bestCost < subseq_matrix[0][vertices].c){
+//         s.sequence.insert(s.sequence.begin() + best_j + 3, s.sequence[best_i]);
+//         s.sequence.insert(s.sequence.begin() + best_j + 4, s.sequence[best_i+1]);
+//         s.sequence.insert(s.sequence.begin() + best_j + 5, s.sequence[best_i+2]);
+//         s.sequence.erase(s.sequence.begin() + (best_i + 2));
+//         s.sequence.erase(s.sequence.begin() + (best_i + 1));
+//         s.sequence.erase(s.sequence.begin() + best_i);
         
-        UpdateAllSubseq(s, subseq_matrix);
+//         UpdateAllSubseq(s, subseq_matrix);
         
-        return true;
-      }
+//         return true;
+//       }
       
-      return false;  
-  }
+//       return false;  
+//  }
+
+
+
+
 }
 
 void BuscaLocal (Solution& s, vector<vector<Subsequence>> &subseqMatrix){
@@ -416,28 +484,20 @@ void BuscaLocal (Solution& s, vector<vector<Subsequence>> &subseqMatrix){
 
     switch (NL[n]) {
       case 1: 
-        // improved= BestImprovementSwap(s, subseqMatrix);    //erro 
-
-        // for(i= 0; i < s.sequence.size(); i++){ 
-        
-        //   cout << s.sequence[i] << " ";
-        // }
-        // cout << endl;
-
-        // getchar();
+        improved= BestImprovementSwap(s, subseqMatrix);    //erro 
         break;
       case 2: 
-        // improved= BestImprovement2Opt(s, subseqMatrix);  
+        improved= BestImprovement2Opt(s, subseqMatrix);  
         break;
       case 3:
         improved= BestImprovementOrOpt(s, subseqMatrix, 1);   //reinsertion    
         break;
-      // case 4:
-      //   improved= BestImprovementOrOpt(s, subseqMatrix, 2);   //Or-opt2      
-      //   break;
-      // case 5:
-      //   improved= BestImprovementOrOpt(s, subseqMatrix, 3);   //Or-opt3      
-      //   break;
+      case 4:
+        improved= BestImprovementOrOpt(s, subseqMatrix, 2);   //Or-opt2      
+        break;
+      case 5:
+        improved= BestImprovementOrOpt(s, subseqMatrix, 3);   //Or-opt3      
+        break;
     }
     
 
@@ -448,13 +508,6 @@ void BuscaLocal (Solution& s, vector<vector<Subsequence>> &subseqMatrix){
       NL.erase(NL.begin() + n);
     }
 
-    cout << "custo " << subseqMatrix[0][vertices].c << endl;
-
-    // for(i= 0; i < NL.size(); i++){ 
-        
-    //       cout << NL[i] << " ";
-    // }
-    // cout << endl;
   } 
 
  }
@@ -504,19 +557,6 @@ void BuscaLocal (Solution& s, vector<vector<Subsequence>> &subseqMatrix){
     }
   }
 
-  
-  // if( (index1 + subseq1) == index2 ){
-  //   s.custoSolucao= s.custoSolucao - matrizAdj[s.sequence[index1-1]][s.sequence[index1]] - matrizAdj[s.sequence[index1+subseq1-1]][s.sequence[index2]]
-  //                                  - matrizAdj[s.sequence[index2+subseq2-1]][s.sequence[index2+subseq2]]
-  //                                  + matrizAdj[s.sequence[index1-1]][s.sequence[index2]] + matrizAdj[s.sequence[index2+subseq2-1]][s.sequence[index1]]
-  //                                  + matrizAdj[s.sequence[index1+subseq1-1]][s.sequence[index2+subseq2]];
-  // }else{
-  //   s.custoSolucao= s.custoSolucao - matrizAdj[s.sequence[index1-1]][s.sequence[index1]] - matrizAdj[s.sequence[index1+subseq1-1]][s.sequence[index1+subseq1]]
-  //                                  - matrizAdj[s.sequence[index2-1]][s.sequence[index2]] - matrizAdj[s.sequence[index2+subseq2-1]][s.sequence[index2+subseq2]]
-  //                                  + matrizAdj[s.sequence[index1-1]][s.sequence[index2]] + matrizAdj[s.sequence[index2+subseq2-1]][s.sequence[index1+subseq1]]
-  //                                  + matrizAdj[s.sequence[index2-1]][s.sequence[index1]] + matrizAdj[s.sequence[index1+subseq1-1]][s.sequence[index2+subseq2]];
-  // }
-
   for(i= 0; i < small; i++){
     swap(s.sequence[index1+i], s.sequence[index2+i]);
   }
@@ -556,7 +596,7 @@ int main(int argc, char** argv) {
     clock_t start= clock();    //inicia a contagem do tempo de execucao  
 
     Solution s, bestS, bestOfAll;
-    double sCustoAcum, bestCustoAcum;
+    double sCustoAcum, bestCustoAcum, bestOfAllCost;
     int maxIter, maxIterIls;
     int i, count, j;
     vector<int> CL;    
@@ -564,15 +604,13 @@ int main(int argc, char** argv) {
 
     readData(argc, argv, &vertices, &matrizAdj);                                                      
 
-    
-    
-
 
     if(vertices < 100){
       maxIterIls= vertices;
     }else{
       maxIterIls= 100;
     }
+
     srand(time(NULL));
 
     for(i= 2; i <= vertices; i++){ 
@@ -580,7 +618,7 @@ int main(int argc, char** argv) {
     }
 
     
-
+   bestOfAllCost= (double) INFINITY;
    maxIter= 10; // 10 iteracoes
 
    for(i= 0; i < maxIter; i++){
@@ -589,47 +627,26 @@ int main(int argc, char** argv) {
 
       vector<vector<Subsequence>> subseq_matrix(vertices+1, vector<Subsequence>(vertices+1)); 
 
-      s= Construction(s, CL);
-
-      cout << "main " << s.sequence.size();
-
-      // for(i= 0; i < vertices; i++){ 
-        
-      //   s.sequence.push_back(i+1);
-      // }
-
-      // s.sequence.push_back(1);
-
-      custo= 0;
-      for(int j= 0; j < s.sequence.size()-1; j++){
-
-        custo += (s.sequence.size()-1 - j) * matrizAdj[s.sequence[j]][s.sequence[j+1]];
-
-      }
-
+      s= Construction(CL);
 
       UpdateAllSubseq(s, subseq_matrix);
-
-     
       
 
       bestCustoAcum= subseq_matrix[0][vertices].c;    //fica como melhor solução, a primeira gerada na construcao
       
-      cout << " na marra " << custo << endl;
-      cout << "update " << bestCustoAcum << endl;
+      //cout << " na marra " << custo << endl;
+      //cout << "update " << bestCustoAcum << endl;
       bestS= s;
 
 
       count= 0;
       while(count < maxIterIls){
 
-        cout << "entrou da busca" << endl; 
+        //cout << "entrou da busca" << endl; 
 
         BuscaLocal(s, subseq_matrix);
       
-        cout << "passou da busca" << endl; 
-
-        getchar();
+        //cout << "passou da busca" << endl; 
 
         if(subseq_matrix[0][vertices].c < bestCustoAcum){
           bestS= s;
@@ -643,8 +660,31 @@ int main(int argc, char** argv) {
         
         count++;
       }
+
+      if(bestCustoAcum < bestOfAllCost){
+        bestOfAll= bestS;
+        bestOfAllCost= bestCustoAcum;
+      }
     
    }
+    
+    // printData();
+
+    // for(j= 0; j < s.sequence.size(); j++){
+    //   cout << s.sequence[j] << " ";
+    // }
+    // cout << endl;
+
+
+    cout << "COST " << bestOfAllCost << endl;
+    
+    clock_t end= clock();
+    double time= ((double) (end - start)) / CLOCKS_PER_SEC;
+
+    cout << "TIME " << time << endl;   //imprime o tempo total de execucao
+
+
+    return 0;
 }
 
 
@@ -652,3 +692,14 @@ int main(int argc, char** argv) {
 //   cout << s.sequence[j] << " ";
 // }
 // cout << endl;
+
+
+
+//funcao pra calcular o custo das subseq:
+
+// custo= 0;
+// for(int j= 0; j < s.sequence.size()-1; j++){
+
+//   custo += (s.sequence.size()-1 - j) * matrizAdj[s.sequence[j]][s.sequence[j+1]];
+
+// }
