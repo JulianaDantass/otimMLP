@@ -22,7 +22,6 @@ struct Solution{
 
 struct InsertionInfo{
   int noInserido;
-  int arestaRemovida;
   double custo;
 };
 
@@ -92,32 +91,24 @@ void UpdateAllSubseq(Solution s, vector<vector<Subsequence>> &subseq_matrix){
 }
 
 
-vector<InsertionInfo> calcularCustoInsercao (Solution& s, std::vector<int>& CL){  //calcular o custo da insercao de cada vertice para Construcao
+vector<InsertionInfo> calcularCustoInsercao (int r, std::vector<int>& CL){  //calcular o custo da insercao de cada vertice para Construcao
 
-  std::vector<InsertionInfo> custoInsercao ((s.sequence.size()-1) * CL.size());
+  std::vector<InsertionInfo> custoInsercao (CL.size());
 
   int a, b, i, k;
   int count= 0;
   int l= 0;
   
 
-  for(int a= 0, b= 1; count < s.sequence.size() - 1; a++, b++){
+  for(int a= 0; a < CL.size(); a++){
     
-    int i= s.sequence[a];
-    int j= s.sequence[b];
-
-    for (auto k : CL){
-      custoInsercao[l].custo= matrizAdj[i][k] + matrizAdj[j][k] - matrizAdj[i][j];
-      custoInsercao[l].noInserido= k;
-      custoInsercao[l].arestaRemovida= a;
-      l++;
-      
-    }
-    count++;
+    custoInsercao[a].custo= matrizAdj[r][CL[a]]; 
+    custoInsercao[a].noInserido= CL[a];
   }
   
   return custoInsercao;
 }
+
 
 Solution Construction (vector<int> CL){  //gerando uma solucao inicial
 
@@ -125,45 +116,38 @@ Solution Construction (vector<int> CL){  //gerando uma solucao inicial
   int indexRandom, i, j;  
   
   s.sequence.push_back(1);
-  s.sequence.push_back(1);      //adicionando a c1 no inicio e no final
 
+  int r= 1;            //porque a primeira cidade eh a 1
+  int selecionado;
 
-  //escolher 3 cidades aleatorias
-      
-    indexRandom= rand() % CL.size();
-    s.sequence.insert(s.sequence.end()-1, CL[indexRandom]);
-    CL.erase(CL.begin() + indexRandom);
-
-    indexRandom= rand() % CL.size();
-    s.sequence.insert(s.sequence.end()-1, CL[indexRandom]);
-    CL.erase(CL.begin() + indexRandom);
-
-    indexRandom= rand() % CL.size();
-    s.sequence.insert(s.sequence.end()-1, CL[indexRandom]);
-    CL.erase(CL.begin() + indexRandom);
-
+  std::vector<InsertionInfo> custoInsercao;
 
   while(!CL.empty()){
 
-    std::vector<InsertionInfo> custoInsercao= calcularCustoInsercao(s, CL);  //calculando os custos de cada insercao
+    custoInsercao= calcularCustoInsercao(r, CL);  //calculando os custos de cada insercao
 
     sort(custoInsercao.begin(), custoInsercao.end(), compares);    //ordenando os custos
     
     double alpha= (double) rand() / RAND_MAX;
     int selecionado= rand() % ( (int) ceil(alpha * custoInsercao.size()) );       //selecionando um dos candidatos de melhor custo
+    
 
-    s.sequence.insert(s.sequence.begin()+ custoInsercao[selecionado].arestaRemovida + 1, custoInsercao[selecionado].noInserido);  //inserindo o candidato
+    r= custoInsercao[selecionado].noInserido;
 
     j= 0;
-    while(1){                     //retirando a cidade inserida da lista de candidatos  
-      if(custoInsercao[selecionado].noInserido == CL[j]){
-        CL.erase(CL.begin()+j);
+    while(1){          
+      if(r == CL[j]){
+        CL.erase(CL.begin()+j);   //retirando a cidade inserida da lista de candidatos
         break;
       }
+
       j++;
     }
 
+    s.sequence.push_back(r);
+
   }
+   s.sequence.push_back(1);      //adicionando a c1 no final
 
   return s;
 }
@@ -291,179 +275,168 @@ bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseq_matr
   bestCost= subseq_matrix[0][vertices].c;
 
 
-  for(i= 1; i < vertices-quantity; i++) {
+  // for(i= 1; i < vertices-quantity; i++) {
 
-      for (j= 1; j < vertices-1; j++){    
+  //     for (j= 1; j < vertices-1; j++){    
 
-        if(j < i){
-          sigma1= Subsequence::Concatenate(subseq_matrix[0][j-1], subseq_matrix[i][i+n]);
-          sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[j][i-1]);
-          sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[i+n+1][s.sequence.size()-1]);
+  //       if(j < i){
+  //         sigma1= Subsequence::Concatenate(subseq_matrix[0][j-1], subseq_matrix[i][i+n]);
+  //         sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[j][i-1]);
+  //         sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[i+n+1][s.sequence.size()-1]);
         
-        }else if(j > i+n+1){
+  //       }else if(j > i+n+1){
 
-          sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+n+1][j-1]);
-          sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i+n]);
-          sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[j][s.sequence.size()-1]);
+  //         sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+n+1][j-1]);
+  //         sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i+n]);
+  //         sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[j][s.sequence.size()-1]);
         
-        }else{
-          continue;
+  //       }else{
+  //         continue;
+  //       }
+
+  //       if(sigma3.c < bestCost){
+
+  //           bestCost= sigma3.c;
+  //           best_i= i;
+  //           best_j= j;
+  //       }
+  //     }
+  // }
+
+
+  // if (bestCost < subseq_matrix[0][vertices].c){
+
+  //     reinsert(s.sequence, best_i, best_i+n, best_j);
+
+  //       UpdateAllSubseq(s, subseq_matrix);
+
+  //       if(bestCost != subseq_matrix[0][vertices].c){
+  //         getchar();
+  //       }
+        
+  //       return true;
+  //     }
+  //     return false;
+
+  switch(quantity){
+    
+    case 1:             //método: REINSERTION
+
+      for(i= 1; i < vertices-1; i++) {
+
+       for (j= 1; j < vertices-1; j++){    
+
+           if(j > i){
+            
+             sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+1][j]);
+             sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i]);
+             sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[j+1][s.sequence.size()-1]);
+
+
+           }else if(j < i){
+             
+             sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i][i]);
+             sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[j][i]);
+             sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[j+1][s.sequence.size()-1]);
+             
+
+            }else{
+              continue;
+            }
+
+           if(sigma3.c < bestCost){
+
+             bestCost= sigma3.c;
+             best_i= i;
+             best_j= j;
+         }
         }
+       }
 
-        if(sigma3.c < bestCost){
+      if (bestCost < subseq_matrix[0][vertices].c){
 
+        s.sequence.insert(s.sequence.begin() + best_j + 1, s.sequence[best_i]);
+         s.sequence.erase(s.sequence.begin() + best_i);
+
+        
+        
+         UpdateAllSubseq(s, subseq_matrix);
+        
+         return true;
+       }
+       return false;
+
+     case 2:          //método: OR-OPT-2
+
+      for(i= 1; i < vertices- 2; i++) {
+
+         for (j= i + 2; j < vertices- 1; j++){
+        
+             sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+2][j]);
+            sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i+1]);
+             sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[j+1][s.sequence.size()-1]);
+
+            if(sigma3.c < bestCost){
+              bestCost= sigma3.c;
+              best_i= i;
+              best_j= j;
+            }
+        }                                             
+      }
+
+      if (bestCost < subseq_matrix[0][vertices].c){
+
+        s.sequence.insert(s.sequence.begin() + best_j + 1, s.sequence[best_i]);
+        s.sequence.insert(s.sequence.begin() + best_j + 2, s.sequence[best_i+1]);
+        s.sequence.erase(s.sequence.begin() + (best_i + 1));
+        s.sequence.erase(s.sequence.begin() + best_i);
+
+      
+        
+        UpdateAllSubseq(s, subseq_matrix);    //fazer o update dos custos da nova solucao melhorada
+        
+        return true;
+      }                                                                            
+      return false;                                                               
+
+    case 3:      //método: OR-OPT-3                                      
+                                                                          
+      for(i= 1; i < vertices - 3; i++) {
+
+        for (j= i + 3; j < vertices- 1; j++){
+
+          sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+3][j]);
+          sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i+2]);
+          sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[j+1][s.sequence.size()-1]);
+      
+
+          if(sigma3.c < bestCost){
             bestCost= sigma3.c;
             best_i= i;
-            best_j= j-1;
+            best_j= j;
+          }
+
         }
       }
-  }
-
-
-  if (bestCost < subseq_matrix[0][vertices].c){
-
-      reinsert(s.sequence, best_i, best_i+n, best_j);
-      //if(quantity == 1){
-
         
 
-     // }else if(quantity == 2){
+      if (bestCost < subseq_matrix[0][vertices].c){
 
-    //     s.sequence.insert(s.sequence.begin() + best_j + 2, s.sequence[best_i]);
-    //     s.sequence.insert(s.sequence.begin() + best_j + 3, s.sequence[best_i+1]);
-    //     s.sequence.erase(s.sequence.begin() + (best_i + 1));
-    //     s.sequence.erase(s.sequence.begin() + best_i);
-
-    //  // }else{
-
-    //     s.sequence.insert(s.sequence.begin() + best_j + 3, s.sequence[best_i]);
-    //     s.sequence.insert(s.sequence.begin() + best_j + 4, s.sequence[best_i+1]);
-    //     s.sequence.insert(s.sequence.begin() + best_j + 5, s.sequence[best_i+2]);
-    //     s.sequence.erase(s.sequence.begin() + (best_i + 2));
-    //     s.sequence.erase(s.sequence.begin() + (best_i + 1));
-    //     s.sequence.erase(s.sequence.begin() + best_i);
-    //   }
+        s.sequence.insert(s.sequence.begin() + best_j + 1, s.sequence[best_i]);
+        s.sequence.insert(s.sequence.begin() + best_j + 2, s.sequence[best_i+1]);
+        s.sequence.insert(s.sequence.begin() + best_j + 3, s.sequence[best_i+2]);
+        s.sequence.erase(s.sequence.begin() + (best_i + 2));
+        s.sequence.erase(s.sequence.begin() + (best_i + 1));
+        s.sequence.erase(s.sequence.begin() + best_i);
+        
 
         UpdateAllSubseq(s, subseq_matrix);
-
-        if(bestCost != subseq_matrix[0][vertices].c){
-          cout << "quebrou o alg de mororo";
-          getchar();
-        }
         
         return true;
       }
-      return false;
-
-//   switch(quantity){
-    
-//     case 1:             //método: REINSERTION
-
-//       for(i= 1; i < vertices-1; i++) {
-
-//        for (j= i+1; j < vertices-1; j++){    
-
-//            if(j== i+1){
-            
-//              sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[j][j]);
-//              sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i]);
-//              sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[j+1][s.sequence.size()-1]);
-
-
-//            }else{
-
-//              sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+1][j]);
-//              sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i]);
-//              sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[j+1][s.sequence.size()-1]);
-//             }
-
-//            if(sigma3.c < bestCost){
-
-//              bestCost= sigma3.c;
-//              best_i= i;
-//             best_j= j;
-//          }
-//        }
-//        }
-
-//       if (bestCost < subseq_matrix[0][vertices].c){
-
-//         s.sequence.insert(s.sequence.begin() + best_j + 1, s.sequence[best_i]);
-//          s.sequence.erase(s.sequence.begin() + best_i);
-        
-//          UpdateAllSubseq(s, subseq_matrix);
-        
-//          return true;
-//        }
-//        return false;
-
-//      case 2:          //método: OR-OPT-2
-
-//       for(i= 1; i < vertices- 2; i++) {
-
-//          for (j= i + 2; j < vertices- 1; j++){
-        
-//              sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+2][j]);
-//             sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i+1]);
-//              sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[j+1][s.sequence.size()-1]);
-
-//             if(sigma3.c < bestCost){
-//               bestCost= sigma3.c;
-//               best_i= i;
-//               best_j= j;
-//             }
-//         }
-//       }
-
-//       if (bestCost < subseq_matrix[0][vertices].c){
-
-//         s.sequence.insert(s.sequence.begin() + best_j + 2, s.sequence[best_i]);
-//         s.sequence.insert(s.sequence.begin() + best_j + 3, s.sequence[best_i+1]);
-//         s.sequence.erase(s.sequence.begin() + (best_i + 1));
-//         s.sequence.erase(s.sequence.begin() + best_i);
-        
-//         UpdateAllSubseq(s, subseq_matrix);    //fazer o update dos custos da nova solucao melhorada
-        
-//         return true;
-//       }                                                                            
-//       return false;                                                               
-
-//     case 3:      //método: OR-OPT-3                                       //1  2   3  4  5  6  7  1
-//                                                                           //1  5  2  3   4  6  7  1 
-//       for(i= 1; i < vertices - 3; i++) {
-
-//         for (j= i + 3; j < vertices- 1; j++){
-
-//           sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+3][j]);
-//           sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i+2]);
-//           sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[j+1][s.sequence.size()-1]);
       
-
-//           if(sigma3.c < bestCost){
-//             bestCost= sigma3.c;
-//             best_i= i;
-//             best_j= j;
-//           }
-
-//         }
-//       }
-        
-
-//       if (bestCost < subseq_matrix[0][vertices].c){
-//         s.sequence.insert(s.sequence.begin() + best_j + 3, s.sequence[best_i]);
-//         s.sequence.insert(s.sequence.begin() + best_j + 4, s.sequence[best_i+1]);
-//         s.sequence.insert(s.sequence.begin() + best_j + 5, s.sequence[best_i+2]);
-//         s.sequence.erase(s.sequence.begin() + (best_i + 2));
-//         s.sequence.erase(s.sequence.begin() + (best_i + 1));
-//         s.sequence.erase(s.sequence.begin() + best_i);
-        
-//         UpdateAllSubseq(s, subseq_matrix);
-        
-//         return true;
-//       }
-      
-//       return false;  
-//  }
+      return false;  
+ }
 
 
 
