@@ -336,8 +336,8 @@ bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseq_matr
            }else if(j < i){
              
              sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i][i]);
-             sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[j][i]);
-             sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[j+1][s.sequence.size()-1]);
+             sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[j][i-1]);
+             sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[i+1][s.sequence.size()-1]);
              
 
             }else{
