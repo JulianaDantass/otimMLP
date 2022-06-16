@@ -248,17 +248,6 @@ bool BestImprovement2Opt (Solution& s, vector<vector<Subsequence>> &subseq_matri
   return false; 
 }
 
-// inline void reinsert(std::vector<int> &vec, int i, int j, int pos){
-//     std::vector<int> seq (vec.begin() + i, vec.begin() +j+1);
-//     if(pos < i){
-//         vec.erase(vec.begin() + i, vec.begin() + j+1);
-//         vec.insert(vec.begin() + pos, seq.begin(), seq.end());
-//     }else{
-//         vec.insert(vec.begin() + pos, seq.begin(), seq.end());
-//         vec.erase(vec.begin() + i, vec.begin() + j+1);
-//     }
-
-// }
 
 
 bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseq_matrix, int quantity){   //as 3 outras estruturas de vizinhança 
@@ -274,49 +263,6 @@ bool BestImprovementOrOpt (Solution& s, vector<vector<Subsequence>> &subseq_matr
 
   bestCost= subseq_matrix[0][vertices].c;
 
-
-  // for(i= 1; i < vertices-quantity; i++) {
-
-  //     for (j= 1; j < vertices-1; j++){    
-
-  //       if(j < i){
-  //         sigma1= Subsequence::Concatenate(subseq_matrix[0][j-1], subseq_matrix[i][i+n]);
-  //         sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[j][i-1]);
-  //         sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[i+n+1][s.sequence.size()-1]);
-        
-  //       }else if(j > i+n+1){
-
-  //         sigma1= Subsequence::Concatenate(subseq_matrix[0][i-1], subseq_matrix[i+n+1][j-1]);
-  //         sigma2= Subsequence::Concatenate(sigma1, subseq_matrix[i][i+n]);
-  //         sigma3= Subsequence::Concatenate(sigma2, subseq_matrix[j][s.sequence.size()-1]);
-        
-  //       }else{
-  //         continue;
-  //       }
-
-  //       if(sigma3.c < bestCost){
-
-  //           bestCost= sigma3.c;
-  //           best_i= i;
-  //           best_j= j;
-  //       }
-  //     }
-  // }
-
-
-  // if (bestCost < subseq_matrix[0][vertices].c){
-
-  //     reinsert(s.sequence, best_i, best_i+n, best_j);
-
-  //       UpdateAllSubseq(s, subseq_matrix);
-
-  //       if(bestCost != subseq_matrix[0][vertices].c){
-  //         getchar();
-  //       }
-        
-  //       return true;
-  //     }
-  //     return false;
 
   switch(quantity){
     
@@ -712,10 +658,6 @@ int main(int argc, char** argv) {
 }
 
 
-// for(j= 0; j < s.sequence.size(); j++){
-//   cout << s.sequence[j] << " ";
-// }
-// cout << endl;
 
 
 
