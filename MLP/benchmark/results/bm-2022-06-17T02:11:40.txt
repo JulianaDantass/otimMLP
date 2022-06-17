@@ -1,0 +1,94 @@
+instances/att48.tsp
+COST 209320
+TIME 0.302373
+instances/bayg29.tsp
+COST 22230
+TIME 0.048004
+instances/bays29.tsp
+COST 26862
+TIME 0.049113
+instances/berlin52.tsp
+COST 143721
+TIME 0.483549
+instances/brazil58.tsp
+COST 512361
+TIME 0.755622
+instances/burma14.tsp
+COST 20315
+TIME 0.005
+instances/dantzig42.tsp
+COST 12528
+TIME 0.225129
+instances/eil101.tsp
+COST 27539
+TIME 6.7717
+instances/eil51.tsp
+COST 10178
+TIME 0.506365
+instances/eil76.tsp
+COST 18047
+TIME 2.1071
+instances/fri26.tsp
+COST 10703
+TIME 0.03159
+instances/gr17.tsp
+COST 12994
+TIME 0.007975
+instances/gr21.tsp
+COST 24345
+TIME 0.019113
+instances/gr24.tsp
+COST 13795
+TIME 0.0257
+instances/gr48.tsp
+COST 102378
+TIME 0.374331
+instances/gr96.tsp
+COST 2.09717e+06
+TIME 4.53921
+instances/hk48.tsp
+COST 247926
+TIME 0.327127
+instances/kroA100.tsp
+COST 983128
+TIME 7.06929
+instances/kroB100.tsp
+COST 986008
+TIME 5.65936
+instances/kroC100.tsp
+COST 961695
+TIME 6.81989
+instances/kroD100.tsp
+COST 980281
+TIME 6.74437
+instances/kroE100.tsp
+COST 971266
+TIME 5.84098
+instances/lin105.tsp
+COST 604669
+TIME 6.85089
+instances/pr107.tsp
+COST 2.02682e+06
+TIME 6.04301
+instances/pr76.tsp
+COST 3.46171e+06
+TIME 1.57462
+instances/rat99.tsp
+COST 57986
+TIME 6.79902
+instances/rd100.tsp
+COST 340047
+TIME 5.71163
+instances/st70.tsp
+COST 20557
+TIME 1.48576
+instances/swiss42.tsp
+COST 22327
+TIME 0.153308
+instances/ulysses16.tsp
+COST 40392
+TIME 0.006821
+instances/ulysses22.tsp
+COST 52064
+TIME 0.017878
+-

@@ -122,15 +122,27 @@ Solution Construction (vector<int> CL){  //gerando uma solucao inicial
 
   std::vector<InsertionInfo> custoInsercao;
 
+
+  int range;
+  double alpha= (rand() % 26) / 100.0;
+
   while(!CL.empty()){
 
     custoInsercao= calcularCustoInsercao(r, CL);  //calculando os custos de cada insercao
 
     sort(custoInsercao.begin(), custoInsercao.end(), compares);    //ordenando os custos
     
-    double alpha= (double) rand() / RAND_MAX;
-    int selecionado= rand() % ( (int) ceil(alpha * custoInsercao.size()) );       //selecionando um dos candidatos de melhor custo
-    
+    range= (int) floor(alpha * custoInsercao.size());
+
+    int selecionado;
+
+    if(range != 0){
+
+     selecionado= rand() % range;
+    }else{
+      
+      selecionado= range;
+    }
 
     r= custoInsercao[selecionado].noInserido;
 
@@ -604,19 +616,14 @@ int main(int argc, char** argv) {
 
       bestCustoAcum= subseq_matrix[0][vertices].c;    //fica como melhor solução, a primeira gerada na construcao
       
-      //cout << " na marra " << custo << endl;
-      //cout << "update " << bestCustoAcum << endl;
-      bestS= s;
 
+      bestS= s;
 
       count= 0;
       while(count < maxIterIls){
 
-        //cout << "entrou da busca" << endl; 
-
         BuscaLocal(s, subseq_matrix);
       
-        //cout << "passou da busca" << endl; 
 
         if(subseq_matrix[0][vertices].c < bestCustoAcum){
           bestS= s;

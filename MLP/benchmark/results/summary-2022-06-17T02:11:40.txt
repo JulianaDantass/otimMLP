@@ -1,0 +1,21 @@
+instances/att48.tsp --- Optimal!
+instances/bayg29.tsp --- Not found
+instances/bays29.tsp --- Not found
+instances/berlin52.tsp --- Optimal!
+instances/brazil58.tsp --- Optimal!
+instances/burma14.tsp --- Not found
+instances/dantzig42.tsp --- Optimal!
+instances/eil101.tsp --- Good
+instances/eil51.tsp --- Optimal!
+instances/eil76.tsp --- Good
+instances/fri26.tsp --- Not found
+instances/gr17.tsp --- Not found
+instances/gr21.tsp --- Not found
+instances/gr24.tsp --- Not found
+instances/gr48.tsp --- Optimal!
+instances/gr96.tsp
+TOTAL COUNT
+Optimal: 6
+Good: 2
+Needs improvement: 0
+Not found: 7

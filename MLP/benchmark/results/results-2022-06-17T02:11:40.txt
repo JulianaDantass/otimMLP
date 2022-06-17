@@ -1,0 +1,55 @@
+instances/att48.tsp
+Avg cost: 209320.0
+Avg time: 0.302373
+Off percentage: 0.0%
+
+Couldn't find optimal data for instances/bayg29.tsp
+
+Couldn't find optimal data for instances/bays29.tsp
+
+instances/berlin52.tsp
+Avg cost: 143721.0
+Avg time: 0.483549
+Off percentage: 0.0%
+
+instances/brazil58.tsp
+Avg cost: 512361.0
+Avg time: 0.755622
+Off percentage: 0.0%
+
+Couldn't find optimal data for instances/burma14.tsp
+
+instances/dantzig42.tsp
+Avg cost: 12528.0
+Avg time: 0.225129
+Off percentage: 0.0%
+
+instances/eil101.tsp
+Avg cost: 27539.0
+Avg time: 6.7717
+Off percentage: 0.09450078144876967%
+
+instances/eil51.tsp
+Avg cost: 10178.0
+Avg time: 0.506365
+Off percentage: 0.0%
+
+instances/eil76.tsp
+Avg cost: 18047.0
+Avg time: 2.1071
+Off percentage: 0.394971072541166%
+
+Couldn't find optimal data for instances/fri26.tsp
+
+Couldn't find optimal data for instances/gr17.tsp
+
+Couldn't find optimal data for instances/gr21.tsp
+
+Couldn't find optimal data for instances/gr24.tsp
+
+instances/gr48.tsp
+Avg cost: 102378.0
+Avg time: 0.374331
+Off percentage: 0.0%
+
+instances/gr96.tsp
